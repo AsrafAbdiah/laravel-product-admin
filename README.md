@@ -36,8 +36,8 @@ Only authenticated **admin** users can use either one.
 
 ```bash
 # 1. Clone and install dependencies
-git clone <repository-url> product-admin
-cd product-admin
+git clone https://github.com/AsrafAbdiah/laravel-product-admin.git
+cd laravel-product-admin
 composer install
 npm install
 
@@ -46,7 +46,7 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Create an empty MySQL database, then update the `DB_*` values in `.env` if needed (defaults: database `bestweb_products`, user `root`, no password).
+Create an empty MySQL database, then update the `DB_*` values in `.env` if needed (defaults: database `laravel_product_admin`, user `root`, no password).
 
 ```bash
 # 3. Create tables and demo data
