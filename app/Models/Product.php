@@ -18,6 +18,15 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     /**
+     * Mirror the database default so a freshly created model reports it too.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'enabled' => true,
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
