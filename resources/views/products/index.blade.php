@@ -17,7 +17,7 @@
     </div>
 
     {{-- Filters --}}
-    <form method="GET" action="{{ route('products.index') }}" class="mb-4 grid gap-3 rounded-lg border border-slate-200 bg-white p-4 sm:grid-cols-6">
+    <form method="GET" action="{{ route('products.index') }}" class="mb-4 grid gap-3 rounded-lg border border-slate-200 bg-white p-4 sm:grid-cols-4 lg:grid-cols-7">
         <input type="search" name="search" value="{{ $filters['search'] }}" placeholder="Search by name..."
                class="rounded-md border border-slate-300 px-3 py-2 text-sm sm:col-span-2">
 
@@ -37,6 +37,16 @@
             <input type="checkbox" name="low_stock" value="1" class="rounded border-slate-300" @checked($filters['low_stock'])>
             Low stock only
         </label>
+        <select name="sort" class="rounded-md border border-slate-300 px-3 py-2 text-sm" aria-label="Sort by">
+            <option value="">Newest first</option>
+            <option value="created_at" @selected($filters['sort'] === 'created_at')>Oldest first</option>
+            <option value="name" @selected($filters['sort'] === 'name')>Name A–Z</option>
+            <option value="-name" @selected($filters['sort'] === '-name')>Name Z–A</option>
+            <option value="price" @selected($filters['sort'] === 'price')>Price: low to high</option>
+            <option value="-price" @selected($filters['sort'] === '-price')>Price: high to low</option>
+            <option value="stock" @selected($filters['sort'] === 'stock')>Stock: low to high</option>
+            <option value="-stock" @selected($filters['sort'] === '-stock')>Stock: high to low</option>
+        </select>
 
         <div class="flex gap-2">
             <button type="submit" class="flex-1 rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-900">Filter</button>

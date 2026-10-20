@@ -94,4 +94,22 @@ class Product extends Model
     {
         $query->when($onlyLowStock, fn (Builder $q) => $q->where('stock', '<=', self::LOW_STOCK_THRESHOLD));
     }
+
+    /**
+     * Sort by a whitelisted field. A leading "-" means descending.
+     * Falls back to newest first. "id" added as a tie-breaker so paging stays consistent.
+     */
+    #[Scope]
+    protected function sorted(Builder $query, ?string $sort): void
+    {
+        if (! $sort) {
+            $query->latest('id');
+
+            return;
+        }
+
+        $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
+
+        $query->orderBy(ltrim($sort, '-'), $direction)->orderByDesc('id');
+    }
 }

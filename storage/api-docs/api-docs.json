@@ -264,6 +264,25 @@
                         }
                     },
                     {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort field. Prefix with - for descending, e.g. -price",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "name",
+                                "-name",
+                                "price",
+                                "-price",
+                                "stock",
+                                "-stock",
+                                "created_at",
+                                "-created_at"
+                            ]
+                        }
+                    },
+                    {
                         "name": "per_page",
                         "in": "query",
                         "required": false,
@@ -651,6 +670,25 @@
                             "enum": [
                                 0,
                                 1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort field. Prefix with - for descending, e.g. -price",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "name",
+                                "-name",
+                                "price",
+                                "-price",
+                                "stock",
+                                "-stock",
+                                "created_at",
+                                "-created_at"
                             ]
                         }
                     }

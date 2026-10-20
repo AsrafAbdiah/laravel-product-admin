@@ -54,7 +54,7 @@ Then send `Authorization: Bearer <token>` and `Accept: application/json` with ea
 | POST | `/api/logout` | Logout |
 | GET | `/api/me` | Current user |
 | GET | `/api/categories` | List categories |
-| GET | `/api/products` | List products. Filters: `status`, `category_id`, `search`, `per_page` |
+| GET | `/api/products` | List products. Filters: `status`, `category_id`, `search`, `low_stock`, `per_page`. Sort: `sort=price` / `sort=-price` (also `name`, `stock`, `created_at`) |
 | POST | `/api/products` | Create product |
 | GET | `/api/products/{id}` | Product detail |
 | PUT | `/api/products/{id}` | Update product |
@@ -84,3 +84,4 @@ Tests use an in-memory SQLite database.
 - The login endpoint is rate limited (5 attempts per minute).
 - Categories are seeded, since category management wasn't part of the requirements.
 - Developed on MariaDB (XAMPP), which is MySQL-compatible.
+- Sorting only accepts whitelisted fields (validated in the Form Request), so user input never goes straight into `orderBy`.

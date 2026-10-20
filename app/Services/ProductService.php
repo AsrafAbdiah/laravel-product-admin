@@ -27,7 +27,7 @@ class ProductService
             ->inCategory($filters['category_id'] ?? null)
             ->search($filters['search'] ?? null)
             ->lowStock($filters['low_stock'] ?? false)
-            ->latest('id');
+            ->sorted($filters['sort'] ?? null);
     }
 
     /**

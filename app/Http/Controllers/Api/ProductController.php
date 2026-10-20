@@ -31,6 +31,7 @@ class ProductController extends Controller
             new OA\Parameter(name: 'category_id', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
             new OA\Parameter(name: 'search', in: 'query', required: false, description: 'Search by product name', schema: new OA\Schema(type: 'string')),
             new OA\Parameter(name: 'low_stock', in: 'query', required: false, description: 'Only products with stock of 10 or less', schema: new OA\Schema(type: 'integer', enum: [0, 1])),
+            new OA\Parameter(name: 'sort', in: 'query', required: false, description: 'Sort field. Prefix with - for descending, e.g. -price', schema: new OA\Schema(type: 'string', enum: ['name', '-name', 'price', '-price', 'stock', '-stock', 'created_at', '-created_at'])),
             new OA\Parameter(name: 'per_page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 15, maximum: 100, minimum: 1)),
             new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
         ],
@@ -175,6 +176,7 @@ class ProductController extends Controller
             new OA\Parameter(name: 'category_id', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
             new OA\Parameter(name: 'search', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
             new OA\Parameter(name: 'low_stock', in: 'query', required: false, description: 'Only products with stock of 10 or less', schema: new OA\Schema(type: 'integer', enum: [0, 1])),
+            new OA\Parameter(name: 'sort', in: 'query', required: false, description: 'Sort field. Prefix with - for descending, e.g. -price', schema: new OA\Schema(type: 'string', enum: ['name', '-name', 'price', '-price', 'stock', '-stock', 'created_at', '-created_at'])),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Excel file', content: new OA\MediaType(

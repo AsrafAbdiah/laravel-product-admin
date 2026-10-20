@@ -135,6 +135,30 @@ class ProductApiTest extends TestCase
     }
 
     #[Test]
+    public function products_can_be_sorted_by_price(): void
+    {
+        Product::factory()->create(['price' => 30]);
+        Product::factory()->create(['price' => 10]);
+        Product::factory()->create(['price' => 20]);
+
+        $this->getJson('/api/products?sort=price')
+            ->assertOk()
+            ->assertJsonPath('data.0.price', '10.00')
+            ->assertJsonPath('data.2.price', '30.00');
+
+        $this->getJson('/api/products?sort=-price')
+            ->assertOk()
+            ->assertJsonPath('data.0.price', '30.00');
+    }
+
+    #[Test]
+    public function sorting_only_allows_whitelisted_fields(): void
+    {
+        $this->getJson('/api/products?sort=password')->assertStatus(422)->assertJsonValidationErrors('sort');
+        $this->getJson('/api/products?sort=price;DROP TABLE products')->assertStatus(422);
+    }
+
+    #[Test]
     public function per_page_is_capped(): void
     {
         $this->getJson('/api/products?per_page=1000')->assertStatus(422)->assertJsonValidationErrors('per_page');
