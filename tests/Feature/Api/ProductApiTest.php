@@ -124,6 +124,17 @@ class ProductApiTest extends TestCase
     }
 
     #[Test]
+    public function products_can_be_filtered_by_low_stock(): void
+    {
+        Product::factory()->count(2)->create(['stock' => 5]);
+        Product::factory()->create(['stock' => Product::LOW_STOCK_THRESHOLD]);
+        Product::factory()->count(3)->create(['stock' => 50]);
+
+        $this->getJson('/api/products?low_stock=1')->assertOk()->assertJsonPath('meta.total', 3);
+        $this->getJson('/api/products')->assertOk()->assertJsonPath('meta.total', 6);
+    }
+
+    #[Test]
     public function per_page_is_capped(): void
     {
         $this->getJson('/api/products?per_page=1000')->assertStatus(422)->assertJsonValidationErrors('per_page');

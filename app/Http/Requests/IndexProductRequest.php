@@ -31,6 +31,7 @@ class IndexProductRequest extends FormRequest
             'status' => ['nullable', 'string', 'in:enabled,disabled'],
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],
             'search' => ['nullable', 'string', 'max:100'],
+            'low_stock' => ['nullable', 'boolean'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ];
     }
@@ -38,7 +39,7 @@ class IndexProductRequest extends FormRequest
     /**
      * The validated filters, with the page size defaulted.
      *
-     * @return array{status: ?string, category_id: ?int, search: ?string, per_page: int}
+     * @return array{status: ?string, category_id: ?int, search: ?string, low_stock: bool, per_page: int}
      */
     public function filters(): array
     {
@@ -46,6 +47,7 @@ class IndexProductRequest extends FormRequest
             'status' => $this->validated('status'),
             'category_id' => $this->validated('category_id') ? (int) $this->validated('category_id') : null,
             'search' => $this->validated('search'),
+            'low_stock' => $this->boolean('low_stock'),
             'per_page' => (int) ($this->validated('per_page') ?? 15),
         ];
     }

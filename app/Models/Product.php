@@ -18,6 +18,11 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     /**
+     * Products at or below this stock level count as "low stock".
+     */
+    public const LOW_STOCK_THRESHOLD = 10;
+
+    /**
      * Mirror the database default so a freshly created model reports it too.
      *
      * @var array<string, mixed>
@@ -79,5 +84,14 @@ class Product extends Model
     protected function search(Builder $query, ?string $term): void
     {
         $query->when($term, fn (Builder $q) => $q->where('name', 'like', '%'.$term.'%'));
+    }
+
+    /**
+     * Only products that are low in stock.
+     */
+    #[Scope]
+    protected function lowStock(Builder $query, bool $onlyLowStock = false): void
+    {
+        $query->when($onlyLowStock, fn (Builder $q) => $q->where('stock', '<=', self::LOW_STOCK_THRESHOLD));
     }
 }

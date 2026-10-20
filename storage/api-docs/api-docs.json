@@ -251,6 +251,19 @@
                         }
                     },
                     {
+                        "name": "low_stock",
+                        "in": "query",
+                        "description": "Only products with stock of 10 or less",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
                         "name": "per_page",
                         "in": "query",
                         "required": false,
@@ -626,6 +639,19 @@
                         "required": false,
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "low_stock",
+                        "in": "query",
+                        "description": "Only products with stock of 10 or less",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     }
                 ],

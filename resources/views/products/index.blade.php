@@ -17,7 +17,7 @@
     </div>
 
     {{-- Filters --}}
-    <form method="GET" action="{{ route('products.index') }}" class="mb-4 grid gap-3 rounded-lg border border-slate-200 bg-white p-4 sm:grid-cols-5">
+    <form method="GET" action="{{ route('products.index') }}" class="mb-4 grid gap-3 rounded-lg border border-slate-200 bg-white p-4 sm:grid-cols-6">
         <input type="search" name="search" value="{{ $filters['search'] }}" placeholder="Search by name..."
                class="rounded-md border border-slate-300 px-3 py-2 text-sm sm:col-span-2">
 
@@ -33,6 +33,10 @@
             <option value="enabled" @selected($filters['status'] === 'enabled')>Enabled</option>
             <option value="disabled" @selected($filters['status'] === 'disabled')>Disabled</option>
         </select>
+        <label class="flex items-center gap-2 text-sm text-slate-600">
+            <input type="checkbox" name="low_stock" value="1" class="rounded border-slate-300" @checked($filters['low_stock'])>
+            Low stock only
+        </label>
 
         <div class="flex gap-2">
             <button type="submit" class="flex-1 rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-900">Filter</button>
