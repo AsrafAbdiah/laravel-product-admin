@@ -78,6 +78,4 @@ use OpenApi\Attributes as OA;
     description: 'Resource not found',
     content: new OA\JsonContent(properties: [new OA\Property(property: 'message', type: 'string', example: 'Resource not found.')]),
 )]
-final class Schemas
-{
-}
+final class Schemas {}

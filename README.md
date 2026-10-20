@@ -1,58 +1,229 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Product Admin: Laravel Product CRUD
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A product management system built with **Laravel 13** and **MySQL**. It has two parts:
 
-## About Laravel
+1. **Admin dashboard** (Blade + Tailwind CSS + Alpine.js) for managing products in the browser.
+2. **RESTful API** secured with **Laravel Sanctum** and documented with **Swagger (OpenAPI 3)**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Only authenticated **admin** users can use either one.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Features
 
-## Learning Laravel
+| Area | What's included |
+|---|---|
+| Products | Create, read, update, soft delete, **bulk delete**, **export to Excel** |
+| Listing | Pagination, filter by **status** (enabled/disabled), filter by **category**, search by name |
+| Categories | `Category` model with a **one-to-many** relationship to `Product`; API responses include `category_id` and `category { id, name }` |
+| Security | Sanctum token auth (API), session auth (dashboard), `admin` middleware, rate-limited login, CSRF protection, mass-assignment protection |
+| Validation | Laravel **Form Requests** for every write and for list filters |
+| Docs | Swagger UI at `/api/documentation` |
+| Tests | 37 PHPUnit tests (feature + unit) |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Requirements
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- PHP **8.3+** (with `pdo_mysql`, `mbstring`, `zip`, `gd`, `fileinfo`, `intl`; `pdo_sqlite` for tests)
+- Composer 2
+- MySQL 8 / MariaDB 10.4+
+- Node.js 20+ and npm
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Setup
 
 ```bash
-composer require laravel/boost --dev
+# 1. Clone and install dependencies
+git clone <repository-url> product-admin
+cd product-admin
+composer install
+npm install
 
-php artisan boost:install
+# 2. Environment
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Create an empty MySQL database, then update the `DB_*` values in `.env` if needed (defaults: database `bestweb_products`, user `root`, no password).
 
-## Contributing
+```bash
+# 3. Create tables and demo data
+php artisan migrate --seed
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 4. Build frontend assets
+npm run build
 
-## Code of Conduct
+# 5. Generate the API documentation
+php artisan l5-swagger:generate
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 6. Run the app
+php artisan serve
+```
 
-## Security Vulnerabilities
+Open **http://localhost:8000**.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Demo accounts (created by the seeder)
 
-## License
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@example.com` | `password` |
+| Regular user (no access) | `user@example.com` | `password` |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The regular user exists so you can check that non-admins are blocked (403 on the API, login refused on the dashboard).
+
+---
+
+## API
+
+Base URL: `http://localhost:8000/api`. Every request should send `Accept: application/json`.
+
+### Authentication
+
+```bash
+curl -X POST http://localhost:8000/api/login \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"password"}'
+```
+
+The response contains a `token`. Send it on every other request:
+
+```
+Authorization: Bearer <token>
+```
+
+### Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/login` | Log in (admin only) and get a token. Rate limited to 5/min |
+| POST | `/api/logout` | Revoke the current token |
+| GET | `/api/me` | Current admin user |
+| GET | `/api/categories` | List categories |
+| GET | `/api/products` | List products (paginated). Query: `status`, `category_id`, `search`, `per_page` (max 100), `page` |
+| POST | `/api/products` | Create a product |
+| GET | `/api/products/{id}` | Product detail |
+| PUT/PATCH | `/api/products/{id}` | Update a product (partial updates allowed) |
+| DELETE | `/api/products/{id}` | Soft delete a product |
+| DELETE | `/api/products/bulk` | Bulk soft delete. Body: `{ "ids": [1, 2, 3] }` (max 100) |
+| GET | `/api/products/export` | Download `.xlsx`. Accepts the same filters as the list |
+
+### Example product response
+
+```json
+{
+  "data": {
+    "id": 51,
+    "name": "Wireless Mouse",
+    "description": "Ergonomic mouse",
+    "price": "49.90",
+    "stock": 10,
+    "enabled": true,
+    "category_id": 1,
+    "category": { "id": 1, "name": "Electronics" },
+    "created_at": "2026-10-20T11:56:14+00:00",
+    "updated_at": "2026-10-20T11:56:14+00:00"
+  }
+}
+```
+
+### Status codes
+
+| Code | Meaning |
+|---|---|
+| 200 / 201 | Success / created |
+| 401 | Missing or invalid token |
+| 403 | Logged in, but not an admin |
+| 404 | Product not found (or soft deleted) |
+| 422 | Validation failed (`errors` object lists each field) |
+| 429 | Too many login attempts |
+
+### Swagger
+
+Interactive docs are at **http://localhost:8000/api/documentation**. To try endpoints:
+
+1. Call `POST /api/login`.
+2. Click **Authorize** and paste the token.
+3. Use "Try it out" on any endpoint.
+
+After changing the API annotations, regenerate with `php artisan l5-swagger:generate`.
+
+---
+
+## Admin dashboard
+
+Log in at `/login` with the admin account.
+
+- **Products list:** search, filter by category and status, paginate, select rows (or the whole page) for **bulk delete**, and **Export to Excel**. The export respects the current filters.
+- **Create / Edit:** a shared form with server-side validation messages.
+- **Detail page:** shows all fields including the category, with Edit and Delete actions.
+
+---
+
+## Running tests
+
+```bash
+php artisan test
+```
+
+Tests use an in-memory SQLite database (see `phpunit.xml`), so they don't touch your MySQL data. They cover:
+
+- API auth: login, wrong password, non-admin blocked, guest gets 401, logout, rate limiting
+- Product API: create, validation, pagination, status/category/search filters, detail with category, update, soft delete, bulk delete, Excel export
+- Dashboard: login, access control, filtering, create, validation errors, edit, delete, bulk delete
+- Unit: relationships, query scopes, soft delete behaviour, price casting
+
+---
+
+## Project structure
+
+```
+app/
+├── Exports/ProductsExport.php          Laravel-Excel export (FromQuery, chunked)
+├── Http/
+│   ├── Controllers/
+│   │   ├── Api/                        AuthController, ProductController, CategoryController
+│   │   ├── Auth/LoginController.php    Dashboard session login
+│   │   └── Web/ProductController.php   Dashboard pages
+│   ├── Middleware/EnsureUserIsAdmin.php
+│   ├── Requests/                       Form Request validation classes
+│   └── Resources/                      API Resources (JSON shape)
+├── Models/                             User, Category, Product
+├── OpenApi/Schemas.php                 Shared Swagger schemas
+└── Services/ProductService.php         Product logic shared by API and dashboard
+```
+
+---
+
+## Design choices and assumptions
+
+**Architecture**
+- **MVC with a small service layer.** The API and the dashboard need the same filtering, pagination and delete logic. Instead of duplicating it in two controllers, `ProductService` holds it and both controllers stay thin. I kept it to one service on purpose: a repository layer on top of Eloquent would add indirection without benefit at this size.
+- **Form Requests** handle all validation, so controllers only deal with already-valid data. `UpdateProductRequest` extends the store rules and makes every field optional, so `PUT` and `PATCH` both work.
+- **API Resources** control the JSON shape, so database columns are never exposed by accident.
+
+**Security**
+- **Sanctum personal access tokens** for the API: simple, first-party, and a good fit for an admin client or Postman/Swagger. The dashboard uses normal session auth with CSRF protection.
+- **Admin-only access** uses an `is_admin` flag checked by the `admin` middleware on every protected route. Non-admins can't get an API token at all. `is_admin` is **not** mass-assignable, so it can't be set through a request.
+- **Login is rate limited** (5 attempts per minute) and the session is regenerated after login to prevent session fixation.
+- API 404s return a generic message instead of internal model class names.
+
+**Performance**
+- The category is **eager loaded** with only the needed columns (`with('category:id,name')`), which avoids N+1 queries.
+- **Indexes** on `products.enabled` and `products.category_id` (from the foreign key) support the filters.
+- Lists are always **paginated**, and `per_page` is capped at 100.
+- **Bulk delete** runs one `UPDATE ... WHERE id IN (...)` query instead of one query per product.
+- The **Excel export** uses `FromQuery`, so Laravel-Excel reads rows in chunks rather than loading the whole table into memory.
+
+**Data**
+- **Soft deletes:** deleted products keep their data (`deleted_at` is set) and disappear from all lists, details and exports. Bulk delete only accepts ids that exist and aren't already deleted.
+- **Price** is stored as `DECIMAL(10,2)` and returned as a string (`"49.90"`) to avoid floating-point rounding errors with money. Validation allows at most 2 decimal places.
+- A category can't be deleted while it still has products (`restrictOnDelete`). Category management wasn't in the scope, so categories are seeded.
+- New products default to **enabled** if `enabled` isn't sent.
+- The currency is shown as RM (Malaysian Ringgit) in the dashboard.
+
+**Assumptions**
+- "Admin" is a flag on the users table rather than a full roles/permissions system, since the brief only needs one role. It could be swapped for `spatie/laravel-permission` if more roles are needed.
+- There is no public registration. Admin accounts are created by the seeder (or `php artisan tinker`).
+- Developed against MariaDB 10.4 (XAMPP), which is MySQL-compatible. Nothing MariaDB-specific is used.
