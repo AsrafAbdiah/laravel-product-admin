@@ -7,6 +7,14 @@ use Illuminate\Foundation\Http\FormRequest;
 class IndexProductRequest extends FormRequest
 {
     /**
+     * On the web dashboard, invalid filters send the user back to the
+     * unfiltered list (API requests get a 422 JSON response instead).
+     *
+     * @var string
+     */
+    protected $redirectRoute = 'products.index';
+
+    /**
      * Access is already restricted to admins by the route middleware.
      */
     public function authorize(): bool
