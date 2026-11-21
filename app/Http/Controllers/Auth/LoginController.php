@@ -37,7 +37,7 @@ class LoginController extends Controller
         // Prevent session fixation.
         $request->session()->regenerate();
 
-        return redirect()->intended(route('products.index'));
+        return redirect()->intended(route('dashboard'));
     }
 
     public function destroy(Request $request): RedirectResponse

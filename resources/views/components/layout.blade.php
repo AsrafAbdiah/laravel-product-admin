@@ -17,6 +17,7 @@
         @php
             // label => [url, is this the current section?, optional badge count]
             $navLinks = [
+                'Dashboard' => [route('dashboard'), request()->routeIs('dashboard'), null],
                 'Products' => [route('products.index'), request()->routeIs('products.*') && ! request()->routeIs('products.trash'), null],
                 'Categories' => [route('categories.index'), request()->routeIs('categories.*'), null],
                 'Trash' => [route('products.trash'), request()->routeIs('products.trash'), $trashCount ?? 0],
@@ -25,7 +26,7 @@
         <nav class="border-b border-slate-200 bg-white">
             <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3">
                 <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
-                    <a href="{{ route('products.index') }}" class="text-lg font-semibold text-slate-900">{{ config('app.name') }}</a>
+                    <a href="{{ route('dashboard') }}" class="text-lg font-semibold text-slate-900">{{ config('app.name') }}</a>
                     @foreach ($navLinks as $label => [$url, $active, $badge])
                         <a href="{{ $url }}"
                            class="inline-flex items-center gap-1.5 text-sm {{ $active ? 'font-semibold text-indigo-600' : 'text-slate-600 hover:text-slate-900' }}"

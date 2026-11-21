@@ -18,6 +18,7 @@ use OpenApi\Attributes as OA;
     description: 'Paste the token returned by POST /api/login.',
 )]
 #[OA\Tag(name: 'Auth', description: 'Admin login and logout')]
+#[OA\Tag(name: 'Dashboard', description: 'Summary numbers')]
 #[OA\Tag(name: 'Products', description: 'Product management')]
 #[OA\Tag(name: 'Categories', description: 'Product categories')]
 #[OA\Tag(name: 'Trash', description: 'Restore or permanently delete soft-deleted products')]

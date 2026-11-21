@@ -424,6 +424,89 @@
                 ]
             }
         },
+        "/api/dashboard": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Summary numbers for the dashboard",
+                "operationId": "de6c688e05d760f6cc5ea6518dbec04f",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "totals": {
+                                            "properties": {
+                                                "products": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "enabled": {
+                                                    "type": "integer",
+                                                    "example": 41
+                                                },
+                                                "disabled": {
+                                                    "type": "integer",
+                                                    "example": 9
+                                                },
+                                                "low_stock": {
+                                                    "description": "Products with stock of 10 or less",
+                                                    "type": "integer",
+                                                    "example": 6
+                                                },
+                                                "in_trash": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "inventory_value": {
+                                                    "description": "Sum of price x stock for active products",
+                                                    "type": "string",
+                                                    "example": "84210.50"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "products_per_category": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Category"
+                                            }
+                                        },
+                                        "low_stock_products": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Product"
+                                            }
+                                        },
+                                        "recent_stock_movements": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/StockMovement"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthenticated"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/products": {
             "get": {
                 "tags": [
@@ -1652,6 +1735,10 @@
         {
             "name": "Auth",
             "description": "Admin login and logout"
+        },
+        {
+            "name": "Dashboard",
+            "description": "Summary numbers"
         },
         {
             "name": "Products",

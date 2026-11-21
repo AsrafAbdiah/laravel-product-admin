@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,8 @@ Route::post('/login', [AuthController::class, 'login'])
 Route::middleware(['auth:sanctum', 'admin'])->name('api.')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('me');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::apiResource('categories', CategoryController::class);
 

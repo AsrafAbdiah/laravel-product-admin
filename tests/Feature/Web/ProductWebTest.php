@@ -25,7 +25,7 @@ class ProductWebTest extends TestCase
         $admin = User::factory()->admin()->create(['password' => 'secret123']);
 
         $this->post('/login', ['email' => $admin->email, 'password' => 'secret123'])
-            ->assertRedirect(route('products.index'));
+            ->assertRedirect(route('dashboard'));
 
         $this->assertAuthenticatedAs($admin);
     }
