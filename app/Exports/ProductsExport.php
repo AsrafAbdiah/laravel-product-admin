@@ -9,12 +9,16 @@ use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 
 /**
  * Exports products to Excel. FromQuery makes Laravel-Excel read the
  * rows in chunks, so large tables don't get loaded into memory at once.
+ *
+ * WithStrictNullComparison matters: without it a stock of 0 is treated
+ * like null and written as an empty cell.
  */
-class ProductsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping
+class ProductsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStrictNullComparison
 {
     use Exportable;
 
