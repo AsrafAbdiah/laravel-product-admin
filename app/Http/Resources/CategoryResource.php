@@ -19,6 +19,8 @@ class CategoryResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            // Only present when the query used withCount('products').
+            'products_count' => $this->whenCounted('products'),
         ];
     }
 }

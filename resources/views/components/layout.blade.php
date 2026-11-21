@@ -14,14 +14,24 @@
 </head>
 <body class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased">
     @auth
+        @php
+            // label => [url, route pattern that marks the link as active]
+            $navLinks = [
+                'Products' => [route('products.index'), 'products.*'],
+                'Categories' => [route('categories.index'), 'categories.*'],
+            ];
+        @endphp
         <nav class="border-b border-slate-200 bg-white">
-            <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-                <div class="flex items-center gap-6">
+            <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3">
+                <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
                     <a href="{{ route('products.index') }}" class="text-lg font-semibold text-slate-900">{{ config('app.name') }}</a>
-                    <a href="{{ route('products.index') }}"
-                       class="text-sm {{ request()->routeIs('products.*') ? 'font-semibold text-indigo-600' : 'text-slate-600 hover:text-slate-900' }}">
-                        Products
-                    </a>
+                    @foreach ($navLinks as $label => [$url, $pattern])
+                        <a href="{{ $url }}"
+                           class="text-sm {{ request()->routeIs($pattern) ? 'font-semibold text-indigo-600' : 'text-slate-600 hover:text-slate-900' }}"
+                           @if (request()->routeIs($pattern)) aria-current="page" @endif>
+                            {{ $label }}
+                        </a>
+                    @endforeach
                     <a href="{{ url('/api/documentation') }}" target="_blank" class="text-sm text-slate-600 hover:text-slate-900">API Docs</a>
                 </div>
                 <div class="flex items-center gap-4 text-sm">
@@ -39,6 +49,12 @@
         @if (session('success'))
             <div class="mb-6 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800" role="status">
                 {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="mb-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+                {{ session('error') }}
             </div>
         @endif
 

@@ -13,6 +13,14 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(property: 'id', type: 'integer', example: 1),
         new OA\Property(property: 'name', type: 'string', example: 'Electronics'),
+        new OA\Property(property: 'products_count', type: 'integer', example: 12, description: 'Active (not deleted) products. Only included on category endpoints'),
+    ],
+)]
+#[OA\Schema(
+    schema: 'CategoryInput',
+    required: ['name'],
+    properties: [
+        new OA\Property(property: 'name', type: 'string', maxLength: 100, example: 'Electronics'),
     ],
 )]
 #[OA\Schema(
@@ -72,6 +80,11 @@ use OpenApi\Attributes as OA;
     response: 'ValidationFailed',
     description: 'Validation failed',
     content: new OA\JsonContent(ref: '#/components/schemas/ValidationError'),
+)]
+#[OA\Response(
+    response: 'Conflict',
+    description: 'The action conflicts with the current state of the resource',
+    content: new OA\JsonContent(properties: [new OA\Property(property: 'message', type: 'string', example: 'This category still has products. Move or permanently delete them first.')]),
 )]
 #[OA\Response(
     response: 'NotFound',

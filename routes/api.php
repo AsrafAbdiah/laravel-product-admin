@@ -15,7 +15,7 @@ Route::middleware(['auth:sanctum', 'admin'])->name('api.')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('me');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::apiResource('categories', CategoryController::class);
 
     // Declared before the resource routes so "bulk" and "export" are not mistaken for a product id.
     Route::delete('/products/bulk', [ProductController::class, 'bulkDestroy'])->name('products.bulk-destroy');

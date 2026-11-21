@@ -23,4 +23,13 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    /**
+     * Whether any product still points at this category. Soft-deleted products
+     * count too: their rows still exist, so the foreign key would block the delete.
+     */
+    public function hasProducts(): bool
+    {
+        return $this->products()->withTrashed()->exists();
+    }
 }
