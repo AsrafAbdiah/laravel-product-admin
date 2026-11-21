@@ -9,7 +9,7 @@
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('products.edit', $product) }}" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Edit</a>
-                <form method="POST" action="{{ route('products.destroy', $product) }}" onsubmit="return confirm('Delete this product?')">
+                <form method="POST" action="{{ route('products.destroy', $product) }}" onsubmit="return confirm('Move this product to the trash?')">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="rounded-md border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50">Delete</button>

@@ -20,6 +20,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Auth', description: 'Admin login and logout')]
 #[OA\Tag(name: 'Products', description: 'Product management')]
 #[OA\Tag(name: 'Categories', description: 'Product categories')]
+#[OA\Tag(name: 'Trash', description: 'Restore or permanently delete soft-deleted products')]
 abstract class Controller
 {
     //

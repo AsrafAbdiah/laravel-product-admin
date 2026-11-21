@@ -108,7 +108,7 @@ class ProductWebTest extends TestCase
         $this->actingAs(User::factory()->admin()->create())
             ->delete('/products/bulk', ['ids' => $products->pluck('id')->all()])
             ->assertRedirect()
-            ->assertSessionHas('success', '3 product(s) deleted.');
+            ->assertSessionHas('success', '3 product(s) moved to the trash.');
 
         $this->assertSame(0, Product::count());
     }

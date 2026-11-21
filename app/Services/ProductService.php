@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\ProductNotInTrashException;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -75,5 +76,55 @@ class ProductService
     public function bulkDelete(array $ids): int
     {
         return Product::whereIn('id', $ids)->delete();
+    }
+
+    /**
+     * Products in the trash, most recently deleted first.
+     *
+     * @param  array{search?: ?string, per_page?: int}  $filters
+     */
+    public function trashed(array $filters = []): LengthAwarePaginator
+    {
+        return Product::onlyTrashed()
+            ->with('category:id,name')
+            ->search($filters['search'] ?? null)
+            ->latest('deleted_at')
+            ->latest('id')
+            ->paginate($filters['per_page'] ?? 15)
+            ->withQueryString();
+    }
+
+    /**
+     * Bring a product back from the trash.
+     *
+     * @throws ProductNotInTrashException
+     */
+    public function restore(Product $product): Product
+    {
+        $this->ensureTrashed($product);
+
+        $product->restore();
+
+        return $product->load('category:id,name');
+    }
+
+    /**
+     * Permanently delete a product. Only allowed from the trash, so a
+     * product always goes through a soft delete first.
+     *
+     * @throws ProductNotInTrashException
+     */
+    public function forceDelete(Product $product): void
+    {
+        $this->ensureTrashed($product);
+
+        $product->forceDelete();
+    }
+
+    private function ensureTrashed(Product $product): void
+    {
+        if (! $product->trashed()) {
+            throw new ProductNotInTrashException;
+        }
     }
 }

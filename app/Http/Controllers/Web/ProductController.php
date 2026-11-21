@@ -71,14 +71,14 @@ class ProductController extends Controller
     {
         $this->products->delete($product);
 
-        return redirect()->route('products.index')->with('success', 'Product deleted.');
+        return redirect()->route('products.index')->with('success', 'Product moved to the trash.');
     }
 
     public function bulkDestroy(BulkDeleteProductRequest $request): RedirectResponse
     {
         $deleted = $this->products->bulkDelete($request->validated('ids'));
 
-        return back()->with('success', "{$deleted} product(s) deleted.");
+        return back()->with('success', "{$deleted} product(s) moved to the trash.");
     }
 
     public function export(IndexProductRequest $request): BinaryFileResponse
@@ -86,6 +86,30 @@ class ProductController extends Controller
         $fileName = 'products-'.now()->format('Ymd-His').'.xlsx';
 
         return Excel::download(new ProductsExport($this->products->query($request->filters())), $fileName);
+    }
+
+    public function trash(IndexProductRequest $request): View
+    {
+        return view('products.trash', [
+            'products' => $this->products->trashed($request->filters()),
+            'filters' => $request->filters(),
+        ]);
+    }
+
+    public function restore(Product $product): RedirectResponse
+    {
+        $this->products->restore($product);
+
+        return back()->with('success', "\"{$product->name}\" restored.");
+    }
+
+    public function forceDestroy(Product $product): RedirectResponse
+    {
+        $name = $product->name;
+
+        $this->products->forceDelete($product);
+
+        return back()->with('success', "\"{$name}\" permanently deleted.");
     }
 
     /**

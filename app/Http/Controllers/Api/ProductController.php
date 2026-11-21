@@ -193,4 +193,73 @@ class ProductController extends Controller
 
         return Excel::download(new ProductsExport($this->products->query($request->filters())), $fileName);
     }
+
+    #[OA\Get(
+        path: '/api/products/trash',
+        summary: 'List products in the trash (soft deleted), most recently deleted first',
+        security: [['sanctum' => []]],
+        tags: ['Trash'],
+        parameters: [
+            new OA\Parameter(name: 'search', in: 'query', required: false, description: 'Search by product name', schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'per_page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 15, maximum: 100, minimum: 1)),
+            new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Paginated list of deleted products (each includes deleted_at)', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/Product')),
+                new OA\Property(property: 'links', type: 'object'),
+                new OA\Property(property: 'meta', ref: '#/components/schemas/PaginationMeta'),
+            ])),
+            new OA\Response(ref: '#/components/responses/Unauthenticated', response: 401),
+            new OA\Response(ref: '#/components/responses/Forbidden', response: 403),
+        ],
+    )]
+    public function trash(IndexProductRequest $request): AnonymousResourceCollection
+    {
+        return ProductResource::collection($this->products->trashed($request->filters()));
+    }
+
+    #[OA\Patch(
+        path: '/api/products/{id}/restore',
+        summary: 'Restore a product from the trash',
+        security: [['sanctum' => []]],
+        tags: ['Trash'],
+        parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Product restored', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'data', ref: '#/components/schemas/Product'),
+            ])),
+            new OA\Response(ref: '#/components/responses/Unauthenticated', response: 401),
+            new OA\Response(ref: '#/components/responses/Forbidden', response: 403),
+            new OA\Response(ref: '#/components/responses/NotFound', response: 404),
+            new OA\Response(ref: '#/components/responses/Conflict', response: 409, description: 'The product is not in the trash'),
+        ],
+    )]
+    public function restore(Product $product): ProductResource
+    {
+        return new ProductResource($this->products->restore($product));
+    }
+
+    #[OA\Delete(
+        path: '/api/products/{id}/force',
+        summary: 'Permanently delete a product. It must be in the trash first',
+        security: [['sanctum' => []]],
+        tags: ['Trash'],
+        parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Product permanently deleted', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'message', type: 'string', example: 'Product permanently deleted.'),
+            ])),
+            new OA\Response(ref: '#/components/responses/Unauthenticated', response: 401),
+            new OA\Response(ref: '#/components/responses/Forbidden', response: 403),
+            new OA\Response(ref: '#/components/responses/NotFound', response: 404),
+            new OA\Response(ref: '#/components/responses/Conflict', response: 409, description: 'The product is not in the trash'),
+        ],
+    )]
+    public function forceDestroy(Product $product): JsonResponse
+    {
+        $this->products->forceDelete($product);
+
+        return response()->json(['message' => 'Product permanently deleted.']);
+    }
 }

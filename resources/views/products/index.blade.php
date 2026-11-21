@@ -58,7 +58,7 @@
     <div x-data="{ selected: [], pageIds: @js($products->pluck('id')) }" class="overflow-hidden rounded-lg border border-slate-200 bg-white">
         <form method="POST" action="{{ route('products.bulk-destroy') }}"
               x-show="selected.length" x-cloak
-              @submit="if (! confirm(`Delete ${selected.length} selected product(s)?`)) $event.preventDefault()"
+              @submit="if (! confirm(`Move ${selected.length} selected product(s) to the trash?`)) $event.preventDefault()"
               class="flex items-center justify-between border-b border-slate-200 bg-amber-50 px-4 py-2 text-sm">
             @csrf
             @method('DELETE')
@@ -105,7 +105,7 @@
                                     <a href="{{ route('products.show', $product) }}" class="text-slate-600 hover:text-slate-900">View</a>
                                     <a href="{{ route('products.edit', $product) }}" class="text-indigo-600 hover:text-indigo-800">Edit</a>
                                     <form method="POST" action="{{ route('products.destroy', $product) }}"
-                                          onsubmit="return confirm('Delete this product?')">
+                                          onsubmit="return confirm('Move this product to the trash?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>

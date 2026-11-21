@@ -28,6 +28,8 @@ class ProductResource extends JsonResource
             'category' => new CategoryResource($this->whenLoaded('category')),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
+            // Only shown for products in the trash.
+            'deleted_at' => $this->when($this->trashed(), fn () => $this->deleted_at->toIso8601String()),
         ];
     }
 }
