@@ -940,6 +940,74 @@
                 ]
             }
         },
+        "/api/products/{id}/stock-movements": {
+            "get": {
+                "tags": [
+                    "Stock history"
+                ],
+                "summary": "A product's stock history, newest first",
+                "operationId": "2a97d948c39c7eedafac0fc082a0b407",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated stock movements (20 per page)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/StockMovement"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "$ref": "#/components/schemas/PaginationMeta"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthenticated"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/products/trash": {
             "get": {
                 "tags": [
@@ -1315,6 +1383,60 @@
                 },
                 "type": "object"
             },
+            "StockMovement": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "product_id": {
+                        "type": "integer",
+                        "example": 7
+                    },
+                    "old_stock": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "new_stock": {
+                        "type": "integer",
+                        "example": 30
+                    },
+                    "change": {
+                        "description": "new_stock minus old_stock; negative when stock went down",
+                        "type": "integer",
+                        "example": 18
+                    },
+                    "reason": {
+                        "type": "string",
+                        "example": "updated",
+                        "enum": [
+                            "created",
+                            "updated",
+                            "imported"
+                        ]
+                    },
+                    "user": {
+                        "description": "Null for system changes such as seeding",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Admin"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "PaginationMeta": {
                 "properties": {
                     "current_page": {
@@ -1455,6 +1577,10 @@
         {
             "name": "Trash",
             "description": "Restore or permanently delete soft-deleted products"
+        },
+        {
+            "name": "Stock history",
+            "description": "Every change to a product's stock, with who made it"
         }
     ]
 }

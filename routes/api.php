@@ -25,6 +25,7 @@ Route::middleware(['auth:sanctum', 'admin'])->name('api.')->group(function () {
     // withTrashed() lets route model binding find soft-deleted products.
     Route::patch('/products/{product}/restore', [ProductController::class, 'restore'])->withTrashed()->name('products.restore');
     Route::delete('/products/{product}/force', [ProductController::class, 'forceDestroy'])->withTrashed()->name('products.force-destroy');
+    Route::get('/products/{product}/stock-movements', [ProductController::class, 'stockMovements'])->withTrashed()->name('products.stock-movements');
 
     Route::apiResource('products', ProductController::class);
 });

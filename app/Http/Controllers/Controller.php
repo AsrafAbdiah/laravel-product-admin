@@ -21,6 +21,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Products', description: 'Product management')]
 #[OA\Tag(name: 'Categories', description: 'Product categories')]
 #[OA\Tag(name: 'Trash', description: 'Restore or permanently delete soft-deleted products')]
+#[OA\Tag(name: 'Stock history', description: 'Every change to a product\'s stock, with who made it')]
 abstract class Controller
 {
     //

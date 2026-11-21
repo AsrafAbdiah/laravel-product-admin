@@ -68,6 +68,22 @@ use OpenApi\Attributes as OA;
     ],
 )]
 #[OA\Schema(
+    schema: 'StockMovement',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 42),
+        new OA\Property(property: 'product_id', type: 'integer', example: 7),
+        new OA\Property(property: 'old_stock', type: 'integer', example: 12),
+        new OA\Property(property: 'new_stock', type: 'integer', example: 30),
+        new OA\Property(property: 'change', type: 'integer', example: 18, description: 'new_stock minus old_stock; negative when stock went down'),
+        new OA\Property(property: 'reason', type: 'string', enum: ['created', 'updated', 'imported'], example: 'updated'),
+        new OA\Property(property: 'user', type: 'object', nullable: true, description: 'Null for system changes such as seeding', properties: [
+            new OA\Property(property: 'id', type: 'integer', example: 1),
+            new OA\Property(property: 'name', type: 'string', example: 'Admin'),
+        ]),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+    ],
+)]
+#[OA\Schema(
     schema: 'PaginationMeta',
     properties: [
         new OA\Property(property: 'current_page', type: 'integer', example: 1),

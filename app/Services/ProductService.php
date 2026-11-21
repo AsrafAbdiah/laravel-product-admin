@@ -88,6 +88,18 @@ class ProductService
     }
 
     /**
+     * A product's stock history, newest first, with who made each change.
+     */
+    public function stockHistory(Product $product, int $perPage = 20): LengthAwarePaginator
+    {
+        return $product->stockMovements()
+            ->with('user:id,name')
+            ->latest('created_at')
+            ->latest('id')
+            ->paginate($perPage);
+    }
+
+    /**
      * Products in the trash, most recently deleted first.
      *
      * @param  array{search?: ?string, per_page?: int}  $filters

@@ -9,6 +9,7 @@ use App\Http\Requests\IndexProductRequest;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\StockMovementResource;
 use App\Models\Product;
 use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
@@ -198,6 +199,31 @@ class ProductController extends Controller
         $fileName = 'products-'.now()->format('Ymd-His').'.xlsx';
 
         return Excel::download(new ProductsExport($this->products->query($request->filters())), $fileName);
+    }
+
+    #[OA\Get(
+        path: '/api/products/{id}/stock-movements',
+        summary: "A product's stock history, newest first",
+        security: [['sanctum' => []]],
+        tags: ['Stock history'],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 1)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Paginated stock movements (20 per page)', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/StockMovement')),
+                new OA\Property(property: 'links', type: 'object'),
+                new OA\Property(property: 'meta', ref: '#/components/schemas/PaginationMeta'),
+            ])),
+            new OA\Response(ref: '#/components/responses/Unauthenticated', response: 401),
+            new OA\Response(ref: '#/components/responses/Forbidden', response: 403),
+            new OA\Response(ref: '#/components/responses/NotFound', response: 404),
+        ],
+    )]
+    public function stockMovements(Product $product): AnonymousResourceCollection
+    {
+        return StockMovementResource::collection($this->products->stockHistory($product));
     }
 
     #[OA\Get(

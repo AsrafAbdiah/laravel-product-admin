@@ -49,6 +49,7 @@ class ProductController extends Controller
     {
         return view('products.show', [
             'product' => $product->load('category:id,name'),
+            'movements' => $this->products->stockHistory($product),
         ]);
     }
 

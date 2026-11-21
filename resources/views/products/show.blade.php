@@ -50,5 +50,48 @@
                 <dd class="col-span-2">{{ $product->updated_at?->format('d M Y, H:i') }}</dd>
             </div>
         </dl>
+
+        <section class="mt-8" aria-labelledby="history-heading">
+            <h2 id="history-heading" class="mb-3 text-lg font-semibold text-slate-900">Stock history</h2>
+
+            <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-200 text-sm">
+                        <thead class="bg-slate-50 text-left text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                            <tr>
+                                <th class="px-4 py-3">When</th>
+                                <th class="px-4 py-3">By</th>
+                                <th class="px-4 py-3">Reason</th>
+                                <th class="px-4 py-3 text-right">Stock</th>
+                                <th class="px-4 py-3 text-right">Change</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @forelse ($movements as $movement)
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap text-slate-600" title="{{ $movement->created_at->format('d M Y, H:i') }}">
+                                        {{ $movement->created_at->diffForHumans() }}
+                                    </td>
+                                    <td class="px-4 py-3">{{ $movement->user?->name ?? 'System' }}</td>
+                                    <td class="px-4 py-3 text-slate-600">{{ $movement->reasonLabel() }}</td>
+                                    <td class="px-4 py-3 text-right whitespace-nowrap tabular-nums">{{ $movement->old_stock }} &rarr; {{ $movement->new_stock }}</td>
+                                    <td class="px-4 py-3 text-right font-medium tabular-nums {{ $movement->change > 0 ? 'text-green-700' : ($movement->change < 0 ? 'text-red-700' : 'text-slate-500') }}">
+                                        {{ $movement->change > 0 ? '+' : '' }}{{ $movement->change }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-4 py-8 text-center text-slate-500">No stock changes recorded yet.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                {{ $movements->links() }}
+            </div>
+        </section>
     </div>
 </x-layout>
