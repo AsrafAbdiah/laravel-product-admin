@@ -21,6 +21,7 @@ Route::middleware(['auth:sanctum', 'admin'])->name('api.')->group(function () {
     Route::delete('/products/bulk', [ProductController::class, 'bulkDestroy'])->name('products.bulk-destroy');
     Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
     Route::get('/products/trash', [ProductController::class, 'trash'])->name('products.trash');
+    Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
 
     // withTrashed() lets route model binding find soft-deleted products.
     Route::patch('/products/{product}/restore', [ProductController::class, 'restore'])->withTrashed()->name('products.restore');

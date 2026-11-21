@@ -4,7 +4,11 @@
             <h1 class="text-2xl font-semibold text-slate-900">Products</h1>
             <p class="text-sm text-slate-500">{{ $products->total() }} product(s) found</p>
         </div>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('products.import') }}"
+               class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50">
+                Import
+            </a>
             <a href="{{ route('products.export', request()->query()) }}"
                class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50">
                 Export to Excel

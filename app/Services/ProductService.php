@@ -3,11 +3,15 @@
 namespace App\Services;
 
 use App\Exceptions\ProductNotInTrashException;
+use App\Imports\ProductsImport;
 use App\Models\Product;
+use App\Models\StockMovement;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Product business logic shared by the API and the web dashboard,
@@ -85,6 +89,28 @@ class ProductService
     public function bulkDelete(array $ids): int
     {
         return Product::whereIn('id', $ids)->delete();
+    }
+
+    /**
+     * Create products from a spreadsheet. Valid rows are imported and
+     * invalid ones are reported back. The Context value labels the stock
+     * history entries as "imported", and only lasts for this call.
+     *
+     * @return array{imported: int, failed: array<int, array{row: int, errors: array<int, string>}>}
+     */
+    public function import(UploadedFile $file): array
+    {
+        $import = new ProductsImport;
+
+        Context::scope(
+            fn () => Excel::import($import, $file),
+            ['stock_reason' => StockMovement::REASON_IMPORTED],
+        );
+
+        return [
+            'imported' => $import->importedCount(),
+            'failed' => $import->failedRows(),
+        ];
     }
 
     /**

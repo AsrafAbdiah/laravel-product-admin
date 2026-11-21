@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Web;
 
 use App\Exports\ProductsExport;
+use App\Exports\ProductsTemplateExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BulkDeleteProductRequest;
+use App\Http\Requests\ImportProductRequest;
 use App\Http\Requests\IndexProductRequest;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
@@ -87,6 +89,25 @@ class ProductController extends Controller
         $fileName = 'products-'.now()->format('Ymd-His').'.xlsx';
 
         return Excel::download(new ProductsExport($this->products->query($request->filters())), $fileName);
+    }
+
+    public function importForm(): View
+    {
+        return view('products.import', [
+            'result' => session('import_result'),
+        ]);
+    }
+
+    public function import(ImportProductRequest $request): RedirectResponse
+    {
+        $result = $this->products->import($request->file('file'));
+
+        return redirect()->route('products.import')->with('import_result', $result);
+    }
+
+    public function importTemplate(): BinaryFileResponse
+    {
+        return Excel::download(new ProductsTemplateExport, 'product-import-template.xlsx');
     }
 
     public function trash(IndexProductRequest $request): View

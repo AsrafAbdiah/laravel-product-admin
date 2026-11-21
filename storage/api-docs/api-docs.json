@@ -940,6 +940,93 @@
                 ]
             }
         },
+        "/api/products/import": {
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Import products from an Excel (.xlsx) or CSV file",
+                "description": "Columns: Name, Category (an existing category name), Description, Price, Stock, Status (enabled/disabled, optional). Valid rows are imported; invalid rows are skipped and listed in \"failed\" with their row number.",
+                "operationId": "dd7d5171cdd91a805518de03df641cc4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": ".xlsx or .csv, max 5 MB",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Import finished",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "18 product(s) imported, 2 row(s) skipped."
+                                        },
+                                        "imported": {
+                                            "type": "integer",
+                                            "example": 18
+                                        },
+                                        "failed": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "row": {
+                                                        "type": "integer",
+                                                        "example": 7
+                                                    },
+                                                    "errors": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        },
+                                                        "example": [
+                                                            "The price field is required."
+                                                        ]
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthenticated"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationFailed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/products/{id}/stock-movements": {
             "get": {
                 "tags": [

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Exports\ProductsExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BulkDeleteProductRequest;
+use App\Http\Requests\ImportProductRequest;
 use App\Http\Requests\IndexProductRequest;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
@@ -199,6 +200,42 @@ class ProductController extends Controller
         $fileName = 'products-'.now()->format('Ymd-His').'.xlsx';
 
         return Excel::download(new ProductsExport($this->products->query($request->filters())), $fileName);
+    }
+
+    #[OA\Post(
+        path: '/api/products/import',
+        summary: 'Import products from an Excel (.xlsx) or CSV file',
+        description: 'Columns: Name, Category (an existing category name), Description, Price, Stock, Status (enabled/disabled, optional). Valid rows are imported; invalid rows are skipped and listed in "failed" with their row number.',
+        security: [['sanctum' => []]],
+        tags: ['Products'],
+        requestBody: new OA\RequestBody(required: true, content: new OA\MediaType(
+            mediaType: 'multipart/form-data',
+            schema: new OA\Schema(required: ['file'], properties: [
+                new OA\Property(property: 'file', type: 'string', format: 'binary', description: '.xlsx or .csv, max 5 MB'),
+            ]),
+        )),
+        responses: [
+            new OA\Response(response: 200, description: 'Import finished', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'message', type: 'string', example: '18 product(s) imported, 2 row(s) skipped.'),
+                new OA\Property(property: 'imported', type: 'integer', example: 18),
+                new OA\Property(property: 'failed', type: 'array', items: new OA\Items(properties: [
+                    new OA\Property(property: 'row', type: 'integer', example: 7),
+                    new OA\Property(property: 'errors', type: 'array', items: new OA\Items(type: 'string'), example: ['The price field is required.']),
+                ])),
+            ])),
+            new OA\Response(ref: '#/components/responses/Unauthenticated', response: 401),
+            new OA\Response(ref: '#/components/responses/Forbidden', response: 403),
+            new OA\Response(ref: '#/components/responses/ValidationFailed', response: 422),
+        ],
+    )]
+    public function import(ImportProductRequest $request): JsonResponse
+    {
+        $result = $this->products->import($request->file('file'));
+
+        return response()->json([
+            'message' => "{$result['imported']} product(s) imported, ".count($result['failed']).' row(s) skipped.',
+            ...$result,
+        ]);
     }
 
     #[OA\Get(

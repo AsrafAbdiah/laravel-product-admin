@@ -19,6 +19,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/products/bulk', [ProductController::class, 'bulkDestroy'])->name('products.bulk-destroy');
     Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
     Route::get('/products/trash', [ProductController::class, 'trash'])->name('products.trash');
+    Route::get('/products/import', [ProductController::class, 'importForm'])->name('products.import');
+    Route::post('/products/import', [ProductController::class, 'import'])->name('products.import.store');
+    Route::get('/products/import/template', [ProductController::class, 'importTemplate'])->name('products.import.template');
 
     // withTrashed() lets route model binding find soft-deleted products.
     Route::patch('/products/{product}/restore', [ProductController::class, 'restore'])->withTrashed()->name('products.restore');
