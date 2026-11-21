@@ -20,6 +20,7 @@ class ProductResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
+            'image_url' => $this->image_url,
             // Kept as a string ("19.90") so money never suffers float rounding.
             'price' => $this->price,
             'stock' => $this->stock,

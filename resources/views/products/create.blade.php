@@ -3,7 +3,7 @@
         <a href="{{ route('products.index') }}" class="text-sm text-slate-500 hover:text-slate-800">&larr; Back to products</a>
         <h1 class="mt-2 mb-6 text-2xl font-semibold text-slate-900">New Product</h1>
 
-        <form method="POST" action="{{ route('products.store') }}" class="rounded-lg border border-slate-200 bg-white p-6">
+        <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data" class="rounded-lg border border-slate-200 bg-white p-6">
             @csrf
             @include('products._form')
 

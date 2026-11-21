@@ -42,6 +42,32 @@
     </div>
 
     <div>
+        <label for="image" class="mb-1 block text-sm font-medium">Image</label>
+        <div class="flex flex-wrap items-center gap-4">
+            @if ($product->exists)
+                <x-product-image :product="$product" size="h-16 w-16" />
+            @endif
+            <div class="min-w-0 flex-1 space-y-2">
+                <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp"
+                       class="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium hover:file:bg-slate-200">
+                <p class="text-xs text-slate-500">
+                    JPG, PNG or WebP, up to 2 MB.
+                    @if ($product->image_path)
+                        Uploading a new image replaces the current one.
+                    @endif
+                </p>
+                @if ($product->image_path)
+                    <label class="flex items-center gap-2 text-sm text-slate-600">
+                        <input type="checkbox" name="remove_image" value="1" class="rounded border-slate-300" @checked(old('remove_image'))>
+                        Remove current image
+                    </label>
+                @endif
+            </div>
+        </div>
+        @error('image') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+    </div>
+
+    <div>
         {{-- The hidden input makes sure "0" is sent when the box is unticked. --}}
         <input type="hidden" name="enabled" value="0">
         <label class="flex items-center gap-2 text-sm font-medium">

@@ -94,7 +94,10 @@
                                        aria-label="Select {{ $product->name }}" class="rounded border-slate-300">
                             </td>
                             <td class="px-4 py-3 font-medium text-slate-900">
-                                <a href="{{ route('products.show', $product) }}" class="hover:text-indigo-600">{{ $product->name }}</a>
+                                <a href="{{ route('products.show', $product) }}" class="flex items-center gap-3 hover:text-indigo-600">
+                                    <x-product-image :product="$product" />
+                                    <span>{{ $product->name }}</span>
+                                </a>
                             </td>
                             <td class="px-4 py-3 text-slate-600">{{ $product->category?->name }}</td>
                             <td class="px-4 py-3 text-right tabular-nums">{{ number_format($product->price, 2) }}</td>

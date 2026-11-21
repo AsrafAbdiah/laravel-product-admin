@@ -3,9 +3,12 @@
         <a href="{{ route('products.index') }}" class="text-sm text-slate-500 hover:text-slate-800">&larr; Back to products</a>
 
         <div class="mt-2 mb-6 flex flex-wrap items-start justify-between gap-3">
-            <div>
-                <h1 class="text-2xl font-semibold text-slate-900">{{ $product->name }}</h1>
-                <p class="text-sm text-slate-500">{{ $product->category?->name }}</p>
+            <div class="flex min-w-0 items-center gap-4">
+                <x-product-image :product="$product" size="h-24 w-24" />
+                <div class="min-w-0">
+                    <h1 class="text-2xl font-semibold text-slate-900">{{ $product->name }}</h1>
+                    <p class="text-sm text-slate-500">{{ $product->category?->name }}</p>
+                </div>
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('products.edit', $product) }}" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Edit</a>

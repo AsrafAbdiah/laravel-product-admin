@@ -559,11 +559,16 @@
                 "tags": [
                     "Products"
                 ],
-                "summary": "Create a product",
+                "summary": "Create a product. Send JSON, or multipart/form-data to attach an image",
                 "operationId": "785644b7d7dd38af4b51dafd0fbc1b6d",
                 "requestBody": {
                     "required": true,
                     "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductMultipartInput"
+                            }
+                        },
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/ProductInput"
@@ -657,7 +662,7 @@
                 "tags": [
                     "Products"
                 ],
-                "summary": "Update a product (all fields optional)",
+                "summary": "Update a product (all fields optional). To upload an image, send POST with _method=PUT as multipart/form-data",
                 "operationId": "416e4959a3919547eb609d87e3db9135",
                 "parameters": [
                     {
@@ -672,6 +677,11 @@
                 "requestBody": {
                     "required": true,
                     "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductMultipartInput"
+                            }
+                        },
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/ProductInput"
@@ -1164,6 +1174,12 @@
                         "example": "Ergonomic 2.4GHz mouse",
                         "nullable": true
                     },
+                    "image_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "example": "http://localhost:8000/storage/products/abc123.jpg",
+                        "nullable": true
+                    },
                     "price": {
                         "description": "Decimal as string to avoid float rounding",
                         "type": "string",
@@ -1231,6 +1247,70 @@
                     "enabled": {
                         "type": "boolean",
                         "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "ProductMultipartInput": {
+                "description": "Same fields as ProductInput, sent as multipart/form-data so an image can be attached. Booleans are sent as 1 or 0.",
+                "required": [
+                    "category_id",
+                    "name",
+                    "price",
+                    "stock"
+                ],
+                "properties": {
+                    "category_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Wireless Mouse",
+                        "maxLength": 255
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 49.9,
+                        "minimum": 0
+                    },
+                    "stock": {
+                        "type": "integer",
+                        "example": 120,
+                        "minimum": 0
+                    },
+                    "enabled": {
+                        "type": "integer",
+                        "example": 1,
+                        "enum": [
+                            0,
+                            1
+                        ]
+                    },
+                    "image": {
+                        "description": "JPG, PNG or WebP, max 2 MB",
+                        "type": "string",
+                        "format": "binary"
+                    },
+                    "remove_image": {
+                        "description": "Updates only: 1 removes the current image",
+                        "type": "integer",
+                        "enum": [
+                            0,
+                            1
+                        ]
+                    },
+                    "_method": {
+                        "description": "Updates only: send POST with _method=PUT, because PHP does not parse multipart bodies on a real PUT",
+                        "type": "string",
+                        "enum": [
+                            "PUT"
+                        ]
                     }
                 },
                 "type": "object"

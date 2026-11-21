@@ -29,6 +29,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'id', type: 'integer', example: 1),
         new OA\Property(property: 'name', type: 'string', example: 'Wireless Mouse'),
         new OA\Property(property: 'description', type: 'string', nullable: true, example: 'Ergonomic 2.4GHz mouse'),
+        new OA\Property(property: 'image_url', type: 'string', format: 'uri', nullable: true, example: 'http://localhost:8000/storage/products/abc123.jpg'),
         new OA\Property(property: 'price', type: 'string', example: '49.90', description: 'Decimal as string to avoid float rounding'),
         new OA\Property(property: 'stock', type: 'integer', example: 120),
         new OA\Property(property: 'enabled', type: 'boolean', example: true),
@@ -48,6 +49,22 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'price', type: 'number', format: 'float', minimum: 0, example: 49.90),
         new OA\Property(property: 'stock', type: 'integer', minimum: 0, example: 120),
         new OA\Property(property: 'enabled', type: 'boolean', example: true),
+    ],
+)]
+#[OA\Schema(
+    schema: 'ProductMultipartInput',
+    description: 'Same fields as ProductInput, sent as multipart/form-data so an image can be attached. Booleans are sent as 1 or 0.',
+    required: ['category_id', 'name', 'price', 'stock'],
+    properties: [
+        new OA\Property(property: 'category_id', type: 'integer', example: 1),
+        new OA\Property(property: 'name', type: 'string', maxLength: 255, example: 'Wireless Mouse'),
+        new OA\Property(property: 'description', type: 'string', nullable: true),
+        new OA\Property(property: 'price', type: 'number', format: 'float', minimum: 0, example: 49.90),
+        new OA\Property(property: 'stock', type: 'integer', minimum: 0, example: 120),
+        new OA\Property(property: 'enabled', type: 'integer', enum: [0, 1], example: 1),
+        new OA\Property(property: 'image', type: 'string', format: 'binary', description: 'JPG, PNG or WebP, max 2 MB'),
+        new OA\Property(property: 'remove_image', type: 'integer', enum: [0, 1], description: 'Updates only: 1 removes the current image'),
+        new OA\Property(property: '_method', type: 'string', enum: ['PUT'], description: 'Updates only: send POST with _method=PUT, because PHP does not parse multipart bodies on a real PUT'),
     ],
 )]
 #[OA\Schema(

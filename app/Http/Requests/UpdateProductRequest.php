@@ -14,6 +14,8 @@ class UpdateProductRequest extends StoreProductRequest
     {
         return collect(parent::rules())
             ->map(fn (array $rules) => in_array('sometimes', $rules, true) ? $rules : ['sometimes', ...$rules])
+            // Lets an edit clear the current image without uploading a new one.
+            ->put('remove_image', ['sometimes', 'boolean'])
             ->all();
     }
 }

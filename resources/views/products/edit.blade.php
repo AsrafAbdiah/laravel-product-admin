@@ -3,7 +3,7 @@
         <a href="{{ route('products.show', $product) }}" class="text-sm text-slate-500 hover:text-slate-800">&larr; Back to product</a>
         <h1 class="mt-2 mb-6 text-2xl font-semibold text-slate-900">Edit Product</h1>
 
-        <form method="POST" action="{{ route('products.update', $product) }}" class="rounded-lg border border-slate-200 bg-white p-6">
+        <form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data" class="rounded-lg border border-slate-200 bg-white p-6">
             @csrf
             @method('PUT')
             @include('products._form')

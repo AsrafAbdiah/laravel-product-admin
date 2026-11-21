@@ -6,6 +6,8 @@ use App\Exceptions\ProductNotInTrashException;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Product business logic shared by the API and the web dashboard,
@@ -42,19 +44,26 @@ class ProductService
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $data  validated input, may include an "image" upload
      */
     public function create(array $data): Product
     {
-        return Product::create($data)->load('category:id,name');
+        return Product::create($this->withImage($data))->load('category:id,name');
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $data  validated input, may include "image" and "remove_image"
      */
     public function update(Product $product, array $data): Product
     {
-        $product->update($data);
+        $oldImage = $product->image_path;
+
+        $product->update($this->withImage($data));
+
+        // Only delete the old file once the database row points somewhere else.
+        if ($oldImage && $oldImage !== $product->image_path) {
+            Storage::disk('public')->delete($oldImage);
+        }
 
         return $product->load('category:id,name');
     }
@@ -119,6 +128,32 @@ class ProductService
         $this->ensureTrashed($product);
 
         $product->forceDelete();
+
+        if ($product->image_path) {
+            Storage::disk('public')->delete($product->image_path);
+        }
+    }
+
+    /**
+     * Turn the "image" upload and "remove_image" flag into an image_path
+     * value. A new upload wins over remove_image.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function withImage(array $data): array
+    {
+        $image = $data['image'] ?? null;
+        $remove = (bool) ($data['remove_image'] ?? false);
+        unset($data['image'], $data['remove_image']);
+
+        if ($image instanceof UploadedFile) {
+            $data['image_path'] = $image->store('products', 'public');
+        } elseif ($remove) {
+            $data['image_path'] = null;
+        }
+
+        return $data;
     }
 
     private function ensureTrashed(Product $product): void

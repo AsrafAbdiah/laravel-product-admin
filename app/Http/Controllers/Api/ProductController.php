@@ -53,10 +53,13 @@ class ProductController extends Controller
 
     #[OA\Post(
         path: '/api/products',
-        summary: 'Create a product',
+        summary: 'Create a product. Send JSON, or multipart/form-data to attach an image',
         security: [['sanctum' => []]],
         tags: ['Products'],
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(ref: '#/components/schemas/ProductInput')),
+        requestBody: new OA\RequestBody(required: true, content: [
+            new OA\JsonContent(ref: '#/components/schemas/ProductInput'),
+            new OA\MediaType(mediaType: 'multipart/form-data', schema: new OA\Schema(ref: '#/components/schemas/ProductMultipartInput')),
+        ]),
         responses: [
             new OA\Response(response: 201, description: 'Product created', content: new OA\JsonContent(properties: [
                 new OA\Property(property: 'data', ref: '#/components/schemas/Product'),
@@ -95,11 +98,14 @@ class ProductController extends Controller
 
     #[OA\Put(
         path: '/api/products/{id}',
-        summary: 'Update a product (all fields optional)',
+        summary: 'Update a product (all fields optional). To upload an image, send POST with _method=PUT as multipart/form-data',
         security: [['sanctum' => []]],
         tags: ['Products'],
         parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(ref: '#/components/schemas/ProductInput')),
+        requestBody: new OA\RequestBody(required: true, content: [
+            new OA\JsonContent(ref: '#/components/schemas/ProductInput'),
+            new OA\MediaType(mediaType: 'multipart/form-data', schema: new OA\Schema(ref: '#/components/schemas/ProductMultipartInput')),
+        ]),
         responses: [
             new OA\Response(response: 200, description: 'Product updated', content: new OA\JsonContent(properties: [
                 new OA\Property(property: 'data', ref: '#/components/schemas/Product'),
