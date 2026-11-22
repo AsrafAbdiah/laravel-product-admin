@@ -1,13 +1,109 @@
 @import 'tailwindcss';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
-@theme {
+/* Dark mode follows a "dark" class on <html>, set by the theme toggle. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * BandarOS design tokens.
+ *
+ * Pages use semantic names (bg-surface, text-ink, border-line, ...) instead
+ * of raw colours. The variables below switch between light and dark, so
+ * components rarely need their own dark: classes.
+ */
+@theme inline {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-canvas: var(--canvas);
+    --color-surface: var(--surface);
+    --color-surface-muted: var(--surface-muted);
+    --color-line: var(--line);
+    --color-line-strong: var(--line-strong);
+    --color-ink: var(--ink);
+    --color-ink-muted: var(--ink-muted);
+    --color-ink-subtle: var(--ink-subtle);
+
+    --color-brand: var(--brand);
+    --color-brand-hover: var(--brand-hover);
+    --color-brand-soft: var(--brand-soft);
+    --color-brand-ink: var(--brand-ink);
+    --color-on-brand: var(--on-brand);
+
+    --color-success: var(--success);
+    --color-success-soft: var(--success-soft);
+    --color-warning: var(--warning);
+    --color-warning-soft: var(--warning-soft);
+    --color-danger: var(--danger);
+    --color-danger-hover: var(--danger-hover);
+    --color-danger-soft: var(--danger-soft);
+}
+
+:root {
+    /* Neutrals lean slightly toward the teal brand so the UI feels of a piece. */
+    --canvas: #f4f7f7;
+    --surface: #ffffff;
+    --surface-muted: #eef3f3;
+    --line: #dde6e6;
+    --line-strong: #c3d1d1;
+    --ink: #0f1c1d;
+    --ink-muted: #4e6264;
+    --ink-subtle: #7f9294;
+
+    --brand: #0f766e;
+    --brand-hover: #115e59;
+    --brand-soft: #e0f2ef;
+    --brand-ink: #0b5a53;
+    --on-brand: #ffffff;
+
+    --success: #15803d;
+    --success-soft: #e3f4e8;
+    --warning: #a35a00;
+    --warning-soft: #fdf1dc;
+    --danger: #c0262d;
+    --danger-hover: #a11f25;
+    --danger-soft: #fce7e7;
+
+    color-scheme: light;
+}
+
+.dark {
+    --canvas: #0b1213;
+    --surface: #111b1c;
+    --surface-muted: #172324;
+    --line: #223132;
+    --line-strong: #314446;
+    --ink: #e5eeee;
+    --ink-muted: #9db0b1;
+    --ink-subtle: #6c8183;
+
+    --brand: #2dd4bf;
+    --brand-hover: #5eead4;
+    --brand-soft: #123a37;
+    --brand-ink: #7ee8d9;
+    --on-brand: #04201d;
+
+    --success: #4ade80;
+    --success-soft: #133222;
+    --warning: #f5b454;
+    --warning-soft: #392911;
+    --danger: #f87171;
+    --danger-hover: #fca5a5;
+    --danger-soft: #3d1517;
+
+    color-scheme: dark;
 }
 
 [x-cloak] {
     display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
 }

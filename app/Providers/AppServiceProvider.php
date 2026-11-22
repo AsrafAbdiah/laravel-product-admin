@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Product;
 use App\Support\CurrentTeam;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Pagination links in the BandarOS style (themed, dark-mode aware).
+        Paginator::defaultView('pagination.default');
+
         // The nav shows how many products are in the trash. A view composer
         // keeps that query out of the Blade template itself.
         View::composer('components.layout', function ($view) {
