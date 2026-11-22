@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Activity;
 use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Models\User;
@@ -50,6 +51,8 @@ class TeamService
         Notification::route('mail', $invitation->email)
             ->notify(new TeamInvitationNotification($invitation, $token));
 
+        $this->log($team, 'member_invited', "invited {$invitation->email} as {$role}");
+
         return $invitation;
     }
 
@@ -66,13 +69,18 @@ class TeamService
             $user->switchTeam($team);
             $invitation->delete();
 
+            $this->log($team, 'member_joined', "joined the shop as {$invitation->role}", $user);
+
             return $team;
         });
     }
 
     public function changeRole(Team $team, User $member, string $role): void
     {
+        $oldRole = $member->teamRole($team);
         $member->setTeamRole($team, $role);
+
+        $this->log($team, 'role_changed', "changed {$member->name}'s role from {$oldRole} to {$role}");
     }
 
     /**
@@ -89,6 +97,22 @@ class TeamService
             if ($member->current_team_id === $team->id) {
                 $member->forceFill(['current_team_id' => null])->save();
             }
+
+            $this->log($team, 'member_removed', "removed {$member->name} ({$member->email}) from the shop");
         });
+    }
+
+    /**
+     * Write a team event to the audit log. The team is set explicitly: the
+     * person acting may currently be working in a different team.
+     */
+    private function log(Team $team, string $event, string $description, ?User $causer = null): void
+    {
+        activity('team')
+            ->event($event)
+            ->performedOn($team)
+            ->causedBy($causer ?? auth()->user())
+            ->tap(fn (Activity $activity) => $activity->team_id = $team->id)
+            ->log($description);
     }
 }

@@ -88,7 +88,16 @@ class ProductService
      */
     public function bulkDelete(array $ids): int
     {
-        return Product::whereIn('id', $ids)->delete();
+        $names = Product::whereIn('id', $ids)->pluck('name');
+        $deleted = Product::whereIn('id', $ids)->delete();
+
+        // One query, so no per-product model events: write one summary entry instead.
+        activity('products')
+            ->event('bulk_deleted')
+            ->withProperties(['ids' => $ids, 'names' => $names])
+            ->log("moved {$deleted} products to the trash");
+
+        return $deleted;
     }
 
     /**
@@ -102,15 +111,23 @@ class ProductService
     {
         $import = new ProductsImport;
 
-        Context::scope(
+        // One audit entry for the whole import rather than one per row.
+        activity()->withoutLogs(fn () => Context::scope(
             fn () => Excel::import($import, $file),
             ['stock_reason' => StockMovement::REASON_IMPORTED],
-        );
+        ));
 
-        return [
+        $result = [
             'imported' => $import->importedCount(),
             'failed' => $import->failedRows(),
         ];
+
+        activity('products')
+            ->event('imported')
+            ->withProperties(['file' => $file->getClientOriginalName(), 'imported' => $result['imported'], 'skipped' => count($result['failed'])])
+            ->log("imported {$result['imported']} products from {$file->getClientOriginalName()}");
+
+        return $result;
     }
 
     /**

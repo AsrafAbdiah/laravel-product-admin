@@ -48,7 +48,7 @@ class ProductImageTest extends TestCase
 
         $this->assertNotNull($product->image_path);
         Storage::disk('public')->assertExists($product->image_path);
-        $response->assertJsonPath('data.image_url', Storage::disk('public')->url($product->image_path));
+        $response->assertJsonPath('data.image_url', asset('storage/'.$product->image_path));
     }
 
     #[Test]

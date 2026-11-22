@@ -30,6 +30,14 @@ class TeamPolicy
     }
 
     /**
+     * The audit log shows everything everyone did, so only managers see it.
+     */
+    public function viewActivity(User $user, Team $team): bool
+    {
+        return $this->manageMembers($user, $team);
+    }
+
+    /**
      * Change someone's role or remove them. Nobody can change the owner,
      * and nobody can change themselves (so an admin can't lock everyone out
      * by demoting the last admin, i.e. themselves, by accident).

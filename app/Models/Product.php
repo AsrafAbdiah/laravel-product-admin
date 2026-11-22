@@ -15,7 +15,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;
+use Spatie\Activitylog\Contracts\Activity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 // "image_path" is fillable for the service, but no Form Request accepts it,
 // so a client can't point a product at an arbitrary file.
@@ -24,7 +26,33 @@ use Illuminate\Support\Facades\Storage;
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
-    use BelongsToTeam, HasFactory, SoftDeletes;
+    use BelongsToTeam, HasFactory, LogsActivity, SoftDeletes;
+
+    /**
+     * Audit log: what to record when a product is created, changed,
+     * moved to the trash, restored or deleted for good.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('products')
+            ->logOnly(['name', 'category.name', 'description', 'price', 'stock', 'enabled', 'image_path'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => match ($event) {
+                'deleted' => $this->isForceDeleting() ? "permanently deleted product \"{$this->name}\"" : "moved product \"{$this->name}\" to the trash",
+                default => "{$event} product \"{$this->name}\"",
+            });
+    }
+
+    /**
+     * Log entries belong to the product's own team, even when written
+     * outside a request (seeders, queued jobs).
+     */
+    public function tapActivity(Activity $activity, string $eventName): void
+    {
+        $activity->team_id = $this->team_id;
+    }
 
     /**
      * Products at or below this stock level count as "low stock".
@@ -77,12 +105,16 @@ class Product extends Model
     /**
      * Public URL of the product image, or null when there is none.
      *
+     * Built from the address the app is being visited on (asset()), not the
+     * configured APP_URL, so it is always "same origin" for the page and
+     * allowed by the Content-Security-Policy (img-src 'self').
+     *
      * @return Attribute<?string, never>
      */
     protected function imageUrl(): Attribute
     {
         return Attribute::get(
-            fn () => $this->image_path ? Storage::disk('public')->url($this->image_path) : null
+            fn () => $this->image_path ? asset('storage/'.$this->image_path) : null
         );
     }
 

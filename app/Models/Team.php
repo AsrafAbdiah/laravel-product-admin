@@ -9,12 +9,40 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Contracts\Activity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[Fillable(['name', 'slug', 'plan'])]
 class Team extends Model
 {
     /** @use HasFactory<TeamFactory> */
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+    /**
+     * Audit log: renaming the shop or changing its plan.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('team')
+            ->logOnly(['name', 'plan'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => "{$event} the shop settings");
+    }
+
+    public function tapActivity(Activity $activity, string $eventName): void
+    {
+        $activity->team_id = $this->id;
+    }
+
+    /**
+     * Only changes are logged; creating a team isn't worth an entry in its own log.
+     *
+     * @var array<int, string>
+     */
+    protected static $recordEvents = ['updated'];
 
     /**
      * Give every team a unique slug automatically, e.g. "kedai-ali-x7k2pq".

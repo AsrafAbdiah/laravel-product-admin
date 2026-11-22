@@ -8,12 +8,30 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\Contracts\Activity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[Fillable(['name'])]
 class Category extends Model
 {
     /** @use HasFactory<CategoryFactory> */
-    use BelongsToTeam, HasFactory;
+    use BelongsToTeam, HasFactory, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('categories')
+            ->logOnly(['name'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => "{$event} category \"{$this->name}\"");
+    }
+
+    public function tapActivity(Activity $activity, string $eventName): void
+    {
+        $activity->team_id = $this->team_id;
+    }
 
     /**
      * A category has many products.
