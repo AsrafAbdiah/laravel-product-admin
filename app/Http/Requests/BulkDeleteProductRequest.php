@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Support\TeamRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class BulkDeleteProductRequest extends FormRequest
 {
@@ -26,7 +26,7 @@ class BulkDeleteProductRequest extends FormRequest
                 'integer',
                 'distinct',
                 // Only products that exist and are not already deleted.
-                Rule::exists('products', 'id')->whereNull('deleted_at'),
+                TeamRule::exists('products')->whereNull('deleted_at'),
             ],
         ];
     }

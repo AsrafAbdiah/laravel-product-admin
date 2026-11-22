@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Validation\Rule;
+use App\Support\TeamRule;
 
 class UpdateCategoryRequest extends StoreCategoryRequest
 {
@@ -15,7 +15,7 @@ class UpdateCategoryRequest extends StoreCategoryRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:100', Rule::unique('categories', 'name')->ignore($this->route('category'))],
+            'name' => ['required', 'string', 'max:100', TeamRule::unique('categories', 'name')->ignore($this->route('category'))],
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\TeamRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class IndexProductRequest extends FormRequest
@@ -29,7 +30,7 @@ class IndexProductRequest extends FormRequest
     {
         return [
             'status' => ['nullable', 'string', 'in:enabled,disabled'],
-            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'category_id' => ['nullable', 'integer', TeamRule::exists('categories')],
             'search' => ['nullable', 'string', 'max:100'],
             'low_stock' => ['nullable', 'boolean'],
             'sort' => ['nullable', 'string', 'in:name,-name,price,-price,stock,-stock,created_at,-created_at'],

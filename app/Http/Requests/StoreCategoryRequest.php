@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Support\TeamRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreCategoryRequest extends FormRequest
 {
@@ -21,7 +21,7 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:100', Rule::unique('categories', 'name')],
+            'name' => ['required', 'string', 'max:100', TeamRule::unique('categories', 'name')],
         ];
     }
 }
