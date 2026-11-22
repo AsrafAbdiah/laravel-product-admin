@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Product;
+use App\Support\CurrentTeam;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,7 +14,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // One CurrentTeam per request (or queued job), shared by every class
+        // that asks for it. "scoped" rather than "singleton" so it is reset
+        // between requests on long-running servers like Octane.
+        $this->app->scoped(CurrentTeam::class);
     }
 
     /**

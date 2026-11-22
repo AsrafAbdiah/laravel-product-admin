@@ -12,7 +12,7 @@ Route::post('/login', [AuthController::class, 'login'])
     ->name('api.login');
 
 // Everything else requires a valid Sanctum token AND an admin user.
-Route::middleware(['auth:sanctum', 'admin'])->name('api.')->group(function () {
+Route::middleware(['auth:sanctum', 'team', 'admin'])->name('api.')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('me');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
