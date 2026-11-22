@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Web\ActivityController;
 use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\InvitationController;
@@ -17,6 +18,8 @@ Route::redirect('/', '/dashboard');
 // pages is decided by policies, from their role in the current team.
 Route::middleware(['auth', 'verified', 'team'])->group(function () {
     Route::get('/settings/profile', [SettingsController::class, 'profile'])->name('settings.profile');
+    Route::get('/settings/sessions', [SettingsController::class, 'sessions'])->name('settings.sessions');
+    Route::delete('/settings/sessions', [SettingsController::class, 'logoutOtherSessions'])->name('settings.sessions.destroy');
     Route::get('/settings/tokens', [SettingsController::class, 'tokens'])->name('settings.tokens');
     Route::post('/settings/tokens', [SettingsController::class, 'storeToken'])->name('settings.tokens.store');
     Route::delete('/settings/tokens/{tokenId}', [SettingsController::class, 'destroyToken'])->whereNumber('tokenId')->name('settings.tokens.destroy');
@@ -29,6 +32,8 @@ Route::middleware(['auth', 'verified', 'team'])->group(function () {
     Route::patch('/team/members/{member}', [TeamController::class, 'updateMember'])->name('team.members.update');
     Route::delete('/team/members/{member}', [TeamController::class, 'removeMember'])->name('team.members.destroy');
     Route::post('/teams/{team}/switch', [TeamController::class, 'switch'])->name('teams.switch');
+
+    Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
 
     // Invitation links from emails.
     Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');

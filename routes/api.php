@@ -14,12 +14,12 @@ Route::post('/login', [AuthController::class, 'login'])
 // Everything else requires a valid Sanctum token. What each user may do
 // is decided by policies, from their role in the current team, and by the
 // token's own abilities (read-only tokens can't change anything).
-Route::middleware(['auth:sanctum', 'team'])->name('api.')->group(function () {
+Route::middleware(['auth:sanctum', 'team', 'throttle:api'])->name('api.')->group(function () {
     // Any token may log itself out, even a read-only one.
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-Route::middleware(['auth:sanctum', 'team', 'token.ability'])->name('api.')->group(function () {
+Route::middleware(['auth:sanctum', 'team', 'token.ability', 'throttle:api'])->name('api.')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('me');
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');

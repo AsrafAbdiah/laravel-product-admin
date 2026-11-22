@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureTokenCanAct;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetCurrentTeam;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -21,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'team' => SetCurrentTeam::class,
             'token.ability' => EnsureTokenCanAct::class,
         ]);
+
+        // Security headers (CSP, clickjacking, MIME sniffing...) on every response.
+        $middleware->append(SecurityHeaders::class);
 
         // The team must be known before route model binding looks up
         // {product} or {category}; otherwise the lookup isn't team-scoped and

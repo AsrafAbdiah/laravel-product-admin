@@ -5,7 +5,7 @@
 <title>{{ $title ? $title.' · ' : '' }}{{ config('app.name') }}</title>
 
 {{-- Apply the saved (or OS) theme before the page paints, to avoid a flash of the wrong theme. --}}
-<script>
+<script nonce="{{ Vite::cspNonce() }}">
     (function () {
         try {
             var saved = localStorage.getItem('theme');
