@@ -1,16 +1,17 @@
-<x-layout title="Edit {{ $product->name }}">
+<x-layout :title="'Edit '.$product->name">
     <div class="mx-auto max-w-2xl">
-        <a href="{{ route('products.show', $product) }}" class="text-sm text-slate-500 hover:text-slate-800">&larr; Back to product</a>
-        <h1 class="mt-2 mb-6 text-2xl font-semibold text-slate-900">Edit Product</h1>
+        <x-ui.page-header title="Edit product" :description="$product->name" :back="route('products.show', $product)" back-label="Back to product" />
 
-        <form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data" class="rounded-lg border border-slate-200 bg-white p-6">
+        <form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            @include('products._form')
+            <x-ui.card>
+                @include('products._form')
+            </x-ui.card>
 
-            <div class="mt-6 flex justify-end gap-2">
-                <a href="{{ route('products.show', $product) }}" class="rounded-md border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Cancel</a>
-                <button type="submit" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Save Changes</button>
+            <div class="mt-4 flex justify-end gap-2">
+                <x-ui.button variant="secondary" :href="route('products.show', $product)">Cancel</x-ui.button>
+                <x-ui.button type="submit">Save changes</x-ui.button>
             </div>
         </form>
     </div>

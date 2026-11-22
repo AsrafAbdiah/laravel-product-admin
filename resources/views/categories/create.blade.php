@@ -1,15 +1,16 @@
-<x-layout title="New Category">
+<x-layout title="New category">
     <div class="mx-auto max-w-xl">
-        <a href="{{ route('categories.index') }}" class="text-sm text-slate-500 hover:text-slate-800">&larr; Back to categories</a>
-        <h1 class="mt-2 mb-6 text-2xl font-semibold text-slate-900">New Category</h1>
+        <x-ui.page-header title="New category" :back="route('categories.index')" back-label="Categories" />
 
-        <form method="POST" action="{{ route('categories.store') }}" class="rounded-lg border border-slate-200 bg-white p-6">
+        <form method="POST" action="{{ route('categories.store') }}">
             @csrf
-            @include('categories._form')
+            <x-ui.card>
+                @include('categories._form')
+            </x-ui.card>
 
-            <div class="mt-6 flex justify-end gap-2">
-                <a href="{{ route('categories.index') }}" class="rounded-md border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Cancel</a>
-                <button type="submit" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Create Category</button>
+            <div class="mt-4 flex justify-end gap-2">
+                <x-ui.button variant="secondary" :href="route('categories.index')">Cancel</x-ui.button>
+                <x-ui.button type="submit">Create category</x-ui.button>
             </div>
         </form>
     </div>
