@@ -37,6 +37,10 @@ class SetCurrentTeam
             abort_if($team === null, Response::HTTP_FORBIDDEN, 'You are not a member of any team.');
 
             $this->currentTeam->set($team);
+
+            // Roles and permissions are per team. Drop any that were loaded on
+            // this user object for another team (long-running servers can reuse it).
+            $user->unsetRelation('roles')->unsetRelation('permissions');
         }
 
         return $next($request);

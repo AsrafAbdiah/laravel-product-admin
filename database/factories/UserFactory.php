@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Team;
 use App\Models\User;
 use App\Support\CurrentTeam;
+use App\Support\Roles;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -54,13 +55,21 @@ class UserFactory extends Factory
     }
 
     /**
-     * Indicate that the user is an administrator.
+     * Owner of their (current) team: can do everything.
      */
     public function admin(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'is_admin' => true,
-        ]);
+        return $this->withRole(Roles::OWNER);
+    }
+
+    /**
+     * Give the user a role in their current team.
+     */
+    public function withRole(string $role): static
+    {
+        return $this->afterCreating(function (User $user) use ($role) {
+            $user->setTeamRole($user->currentTeam, $role);
+        });
     }
 
     /**

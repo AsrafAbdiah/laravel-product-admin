@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\CurrentTeam;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -14,14 +15,16 @@ use Illuminate\Notifications\Notifiable;
 use InvalidArgumentException;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
-// "is_admin" is intentionally not fillable so it can never be set through mass assignment.
+// Roles are not columns on the user: they live per team (spatie/laravel-permission),
+// and current_team_id is set only through switchTeam(). Neither is mass-assignable.
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * Get the attributes that should be cast.
@@ -33,8 +36,41 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_admin' => 'boolean',
         ];
+    }
+
+    /**
+     * Give the user a role in a specific team (replacing any role they had there).
+     */
+    public function setTeamRole(Team $team, string $role): void
+    {
+        $this->inTeam($team, fn () => $this->syncRoles([$role]));
+    }
+
+    /**
+     * The user's role in a specific team, or null when they have none.
+     */
+    public function teamRole(Team $team): ?string
+    {
+        return $this->inTeam($team, fn () => $this->roles()->value('name'));
+    }
+
+    /**
+     * Run a callback with roles and permissions looked up for $team.
+     */
+    private function inTeam(Team $team, callable $callback): mixed
+    {
+        $currentTeam = app(CurrentTeam::class);
+        $previous = $currentTeam->get();
+        $currentTeam->set($team);
+
+        try {
+            return $callback();
+        } finally {
+            $currentTeam->set($previous);
+            // Loaded roles/permissions belonged to $team; don't reuse them for another team.
+            $this->unsetRelation('roles')->unsetRelation('permissions');
+        }
     }
 
     /**
@@ -71,7 +107,11 @@ class User extends Authenticatable implements MustVerifyEmail
             throw new InvalidArgumentException('The user is not a member of the team.');
         }
 
-        // forceFill: current_team_id is deliberately not mass-asignable.
+        // forceFill: current_team_id is deliberately not mass-assignable.
         $this->forceFill(['current_team_id' => $team->id])->save();
+
+        // Keep the loaded relation in step, or this object would keep
+        // reporting the previous team as current.
+        $this->setRelation('currentTeam', $team);
     }
 }

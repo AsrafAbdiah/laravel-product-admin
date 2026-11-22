@@ -1,7 +1,9 @@
 <x-layout title="Dashboard">
     <x-ui.page-header title="Dashboard" description="Overview of your catalogue and stock.">
         <x-slot:actions>
-            <x-ui.button :href="route('products.create')" icon="plus">New product</x-ui.button>
+            @can('create', App\Models\Product::class)
+                <x-ui.button :href="route('products.create')" icon="plus">New product</x-ui.button>
+            @endcan
         </x-slot:actions>
     </x-ui.page-header>
 

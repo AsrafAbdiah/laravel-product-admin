@@ -1,14 +1,18 @@
 <x-layout title="Categories">
     <x-ui.page-header title="Categories" :description="$categories->total().' '.Str::plural('category', $categories->total())">
-        <x-slot:actions>
-            <x-ui.button :href="route('categories.create')" icon="plus">New category</x-ui.button>
-        </x-slot:actions>
+        @can('create', App\Models\Category::class)
+            <x-slot:actions>
+                <x-ui.button :href="route('categories.create')" icon="plus">New category</x-ui.button>
+            </x-slot:actions>
+        @endcan
     </x-ui.page-header>
 
     <x-ui.card :padding="false">
         @if ($categories->isEmpty())
             <x-ui.empty-state icon="tag" title="No categories yet." description="Categories group your products, e.g. Drinks or Snacks.">
-                <x-ui.button :href="route('categories.create')" icon="plus">New category</x-ui.button>
+                @can('create', App\Models\Category::class)
+                    <x-ui.button :href="route('categories.create')" icon="plus">New category</x-ui.button>
+                @endcan
             </x-ui.empty-state>
         @else
             <ul class="divide-y divide-line">
@@ -23,6 +27,7 @@
                                 {{ $category->products_count }} {{ Str::plural('product', $category->products_count) }}
                             </a>
                         </div>
+                        @can('update', $category)
                         <div class="flex gap-1">
                             <x-ui.button variant="ghost" size="sm" :href="route('categories.edit', $category)">Edit</x-ui.button>
                             <form method="POST" action="{{ route('categories.destroy', $category) }}"
@@ -32,6 +37,7 @@
                                 <x-ui.button type="submit" variant="ghost" size="sm" class="hover:text-danger">Delete</x-ui.button>
                             </form>
                         </div>
+                        @endcan
                     </li>
                 @endforeach
             </ul>

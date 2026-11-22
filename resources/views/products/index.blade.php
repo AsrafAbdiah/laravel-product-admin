@@ -1,8 +1,12 @@
 <x-layout title="Products">
     <x-ui.page-header title="Products" :description="$products->total().' product(s) found'">
         <x-slot:actions>
-            <x-ui.button variant="secondary" :href="route('products.export', request()->query())" icon="download">Export</x-ui.button>
-            <x-ui.button :href="route('products.create')" icon="plus">New product</x-ui.button>
+            @can('export', App\Models\Product::class)
+                <x-ui.button variant="secondary" :href="route('products.export', request()->query())" icon="download">Export</x-ui.button>
+            @endcan
+            @can('create', App\Models\Product::class)
+                <x-ui.button :href="route('products.create')" icon="plus">New product</x-ui.button>
+            @endcan
         </x-slot:actions>
     </x-ui.page-header>
 
@@ -53,7 +57,9 @@
     </form>
 
     {{-- Results, with bulk selection (Alpine.js keeps track of the checked ids) --}}
+    @php $canBulkDelete = auth()->user()->can('deleteAny', App\Models\Product::class); @endphp
     <div x-data="{ selected: [], pageIds: @js($products->pluck('id')) }" class="overflow-hidden rounded-xl border border-line bg-surface shadow-xs">
+        @if ($canBulkDelete)
         <form method="POST" action="{{ route('products.bulk-destroy') }}"
               x-show="selected.length" x-cloak
               :data-confirm="`Move ${selected.length} selected product(s) to the trash? You can restore them later.`"
@@ -70,10 +76,13 @@
                 <x-ui.button type="submit" variant="danger" size="sm" icon="trash">Delete selected</x-ui.button>
             </div>
         </form>
+        @endif
 
         @if ($products->isEmpty())
             <x-ui.empty-state title="No products found" description="Try different filters, or add your first product.">
-                <x-ui.button :href="route('products.create')" icon="plus">New product</x-ui.button>
+                @can('create', App\Models\Product::class)
+                    <x-ui.button :href="route('products.create')" icon="plus">New product</x-ui.button>
+                @endcan
             </x-ui.empty-state>
         @else
             {{-- Table on tablets and up --}}
@@ -81,11 +90,13 @@
                 <table class="min-w-full divide-y divide-line text-sm">
                     <thead class="bg-surface-muted text-left text-xs font-semibold tracking-wide text-ink-muted uppercase">
                         <tr>
+                            @if ($canBulkDelete)
                             <th class="w-10 px-4 py-3">
                                 <input type="checkbox" aria-label="Select all on this page" class="h-4 w-4 rounded accent-brand"
                                        :checked="pageIds.length && selected.length === pageIds.length"
                                        @change="selected = $event.target.checked ? [...pageIds] : []">
                             </th>
+                            @endif
                             <th class="px-4 py-3">Name</th>
                             <th class="px-4 py-3">Category</th>
                             <th class="px-4 py-3 text-right">Price (RM)</th>
@@ -97,10 +108,12 @@
                     <tbody class="divide-y divide-line">
                         @foreach ($products as $product)
                             <tr class="hover:bg-surface-muted/60" :class="selected.includes({{ $product->id }}) && 'bg-brand-soft/50'">
+                                @if ($canBulkDelete)
                                 <td class="px-4 py-3">
                                     <input type="checkbox" value="{{ $product->id }}" x-model.number="selected"
                                            aria-label="Select {{ $product->name }}" class="h-4 w-4 rounded accent-brand">
                                 </td>
+                                @endif
                                 <td class="px-4 py-3">
                                     <a href="{{ route('products.show', $product) }}" class="flex items-center gap-3 font-medium hover:text-brand">
                                         <x-product-image :product="$product" />
@@ -113,7 +126,10 @@
                                 <td class="px-4 py-3"><x-status-badge :enabled="$product->enabled" /></td>
                                 <td class="px-4 py-3">
                                     <div class="flex justify-end gap-1">
-                                        <x-ui.button variant="ghost" size="sm" :href="route('products.edit', $product)">Edit</x-ui.button>
+                                        @can('update', $product)
+                                            <x-ui.button variant="ghost" size="sm" :href="route('products.edit', $product)">Edit</x-ui.button>
+                                        @endcan
+                                        @can('delete', $product)
                                         <form method="POST" action="{{ route('products.destroy', $product) }}"
                                               data-confirm="Move &quot;{{ $product->name }}&quot; to the trash? You can restore it later."
                                               data-confirm-title="Move to trash" data-confirm-label="Move to trash">
@@ -121,6 +137,7 @@
                                             @method('DELETE')
                                             <x-ui.button type="submit" variant="ghost" size="sm" class="hover:text-danger">Delete</x-ui.button>
                                         </form>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>
@@ -133,8 +150,10 @@
             <ul class="divide-y divide-line md:hidden">
                 @foreach ($products as $product)
                     <li class="flex items-center gap-3 px-4 py-3">
+                        @if ($canBulkDelete)
                         <input type="checkbox" value="{{ $product->id }}" x-model.number="selected"
                                aria-label="Select {{ $product->name }}" class="h-4 w-4 shrink-0 rounded accent-brand">
+                        @endif
                         <a href="{{ route('products.show', $product) }}" class="flex min-w-0 flex-1 items-center gap-3">
                             <x-product-image :product="$product" size="h-12 w-12" />
                             <span class="min-w-0 flex-1">

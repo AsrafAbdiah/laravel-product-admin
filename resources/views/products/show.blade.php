@@ -2,7 +2,10 @@
     <div class="mx-auto max-w-4xl">
         <x-ui.page-header :title="$product->name" :description="$product->category?->name" :back="route('products.index')" back-label="Products">
             <x-slot:actions>
-                <x-ui.button variant="secondary" :href="route('products.edit', $product)" icon="edit">Edit</x-ui.button>
+                @can('update', $product)
+                    <x-ui.button variant="secondary" :href="route('products.edit', $product)" icon="edit">Edit</x-ui.button>
+                @endcan
+                @can('delete', $product)
                 <form method="POST" action="{{ route('products.destroy', $product) }}"
                       data-confirm="Move &quot;{{ $product->name }}&quot; to the trash? You can restore it later."
                       data-confirm-title="Move to trash" data-confirm-label="Move to trash">
@@ -10,6 +13,7 @@
                     @method('DELETE')
                     <x-ui.button type="submit" variant="secondary" icon="trash" class="hover:text-danger">Delete</x-ui.button>
                 </form>
+                @endcan
             </x-slot:actions>
         </x-ui.page-header>
 

@@ -6,6 +6,11 @@ use App\Support\TeamRule;
 
 class UpdateCategoryRequest extends StoreCategoryRequest
 {
+    public function authorize(): bool
+    {
+        return $this->user()->can('update', $this->route('category'));
+    }
+
     /**
      * Same rules as creating, but the unique check ignores the category
      * being edited, so saving it without renaming doesn't fail.

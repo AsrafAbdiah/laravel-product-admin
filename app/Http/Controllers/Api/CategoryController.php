@@ -28,6 +28,8 @@ class CategoryController extends Controller
     )]
     public function index(): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', Category::class);
+
         // Unpaginated on purpose: the list is small and feeds dropdowns.
         return CategoryResource::collection(
             Category::select(['id', 'name'])->withCount('products')->orderBy('name')->get()
@@ -73,6 +75,8 @@ class CategoryController extends Controller
     )]
     public function show(Category $category): CategoryResource
     {
+        $this->authorize('view', $category);
+
         return new CategoryResource($category->loadCount('products'));
     }
 
@@ -118,6 +122,8 @@ class CategoryController extends Controller
     )]
     public function destroy(Category $category): JsonResponse
     {
+        $this->authorize('delete', $category);
+
         if ($category->hasProducts()) {
             return response()->json([
                 'message' => 'This category still has products. Move or permanently delete them first.',

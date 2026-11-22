@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Team;
 use App\Models\User;
 use App\Support\CurrentTeam;
+use App\Support\Roles;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Date;
 
@@ -90,16 +91,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // One member per role in the demo store, so each role can be tried out.
         $demoShop = Team::create(['name' => 'BandarOS Demo Store']);
         $this->seedShop($demoShop, [
-            ['Admin', 'admin@example.com', true],
-            // A normal user, handy for checking that non-admins are blocked.
-            ['Regular User', 'user@example.com', false],
+            ['Admin', 'admin@example.com', Roles::OWNER],
+            ['Aina (Manager)', 'manager@example.com', Roles::ADMIN],
+            ['Staff Member', 'staff@example.com', Roles::STAFF],
+            ['Regular User', 'user@example.com', Roles::VIEWER],
         ], self::CATALOGUE, withHistory: true);
 
         $secondShop = Team::create(['name' => 'Kedai Kopi Siti']);
         $this->seedShop($secondShop, [
-            ['Siti', 'siti@example.com', true],
+            ['Siti', 'siti@example.com', Roles::OWNER],
         ], self::SECOND_SHOP_CATALOGUE, withHistory: false);
 
         app(CurrentTeam::class)->set(null);
@@ -109,7 +112,7 @@ class DatabaseSeeder extends Seeder
      * Create a shop's members and products. Everything inside runs "as" that
      * team, so BelongsToTeam fills in team_id automatically.
      *
-     * @param  array<int, array{0: string, 1: string, 2: bool}>  $members  name, email, is admin
+     * @param  array<int, array{0: string, 1: string, 2: string}>  $members  name, email, role (the first is the owner)
      * @param  array<string, array<int, array{0: string, 1: float, 2: int, 3: string}>>  $catalogue
      */
     private function seedShop(Team $team, array $members, array $catalogue, bool $withHistory): void
@@ -117,7 +120,7 @@ class DatabaseSeeder extends Seeder
         app(CurrentTeam::class)->set($team);
 
         $users = collect($members)->map(fn (array $member) => User::factory()
-            ->state(['is_admin' => $member[2]])
+            ->withRole($member[2])
             ->create(['name' => $member[0], 'email' => $member[1], 'password' => 'password']));
         $owner = $users->first();
 

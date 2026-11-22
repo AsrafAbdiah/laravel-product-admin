@@ -11,12 +11,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
 
-// Account settings: any verified user, whatever their role.
+// Signed-in, verified members of a team. What each person may do on these
+// pages is decided by policies, from their role in the current team.
 Route::middleware(['auth', 'verified', 'team'])->group(function () {
     Route::get('/settings/profile', [SettingsController::class, 'profile'])->name('settings.profile');
-});
 
-Route::middleware(['auth', 'verified', 'team', 'admin'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     // Declared before the resource routes so "bulk", "export" and "trash" are not mistaken for a product id.

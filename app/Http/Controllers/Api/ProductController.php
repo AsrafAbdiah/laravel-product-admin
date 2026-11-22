@@ -50,6 +50,8 @@ class ProductController extends Controller
     )]
     public function index(IndexProductRequest $request): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', Product::class);
+
         return ProductResource::collection($this->products->paginate($request->filters()));
     }
 
@@ -95,6 +97,8 @@ class ProductController extends Controller
     )]
     public function show(Product $product): ProductResource
     {
+        $this->authorize('view', $product);
+
         return new ProductResource($product->load('category:id,name'));
     }
 
@@ -140,6 +144,8 @@ class ProductController extends Controller
     )]
     public function destroy(Product $product): JsonResponse
     {
+        $this->authorize('delete', $product);
+
         $this->products->delete($product);
 
         return response()->json(['message' => 'Product deleted.']);
@@ -197,6 +203,8 @@ class ProductController extends Controller
     )]
     public function export(IndexProductRequest $request): BinaryFileResponse
     {
+        $this->authorize('export', Product::class);
+
         $fileName = 'products-'.now()->format('Ymd-His').'.xlsx';
 
         return Excel::download(new ProductsExport($this->products->query($request->filters())), $fileName);
@@ -260,6 +268,8 @@ class ProductController extends Controller
     )]
     public function stockMovements(Product $product): AnonymousResourceCollection
     {
+        $this->authorize('view', $product);
+
         return StockMovementResource::collection($this->products->stockHistory($product));
     }
 
@@ -285,6 +295,8 @@ class ProductController extends Controller
     )]
     public function trash(IndexProductRequest $request): AnonymousResourceCollection
     {
+        $this->authorize('viewTrash', Product::class);
+
         return ProductResource::collection($this->products->trashed($request->filters()));
     }
 
@@ -306,6 +318,8 @@ class ProductController extends Controller
     )]
     public function restore(Product $product): ProductResource
     {
+        $this->authorize('restore', $product);
+
         return new ProductResource($this->products->restore($product));
     }
 
@@ -327,6 +341,8 @@ class ProductController extends Controller
     )]
     public function forceDestroy(Product $product): JsonResponse
     {
+        $this->authorize('forceDelete', $product);
+
         $this->products->forceDelete($product);
 
         return response()->json(['message' => 'Product permanently deleted.']);

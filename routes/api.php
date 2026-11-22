@@ -11,8 +11,9 @@ Route::post('/login', [AuthController::class, 'login'])
     ->middleware('throttle:5,1')
     ->name('api.login');
 
-// Everything else requires a valid Sanctum token AND an admin user.
-Route::middleware(['auth:sanctum', 'team', 'admin'])->name('api.')->group(function () {
+// Everything else requires a valid Sanctum token. What each user may do
+// is decided by policies, from their role in the current team.
+Route::middleware(['auth:sanctum', 'team'])->name('api.')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('me');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

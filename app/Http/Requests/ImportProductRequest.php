@@ -2,16 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ImportProductRequest extends FormRequest
 {
-    /**
-     * Access is already restricted to admins by the route middleware.
-     */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('import', Product::class);
     }
 
     /**

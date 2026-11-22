@@ -46,14 +46,15 @@ class AuthTest extends TestCase
     }
 
     #[Test]
-    public function non_admin_cannot_get_a_token(): void
+    public function a_member_without_a_role_gets_a_token_but_it_cannot_do_anything(): void
     {
         $user = User::factory()->create(['password' => 'secret123']);
 
-        $this->postJson('/api/login', ['email' => $user->email, 'password' => 'secret123'])
-            ->assertForbidden();
+        $token = $this->postJson('/api/login', ['email' => $user->email, 'password' => 'secret123'])
+            ->assertOk()
+            ->json('token');
 
-        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->withToken($token)->getJson('/api/products')->assertForbidden();
     }
 
     #[Test]

@@ -4,6 +4,11 @@ namespace App\Http\Requests;
 
 class UpdateProductRequest extends StoreProductRequest
 {
+    public function authorize(): bool
+    {
+        return $this->user()->can('update', $this->route('product'));
+    }
+
     /**
      * Same rules as creating, but every field is optional so the
      * endpoint supports partial updates (PATCH) as well as PUT.

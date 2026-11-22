@@ -4,6 +4,7 @@ namespace App\Actions\Fortify;
 
 use App\Models\Team;
 use App\Models\User;
+use App\Support\Roles;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -48,13 +49,10 @@ class CreateNewUser implements CreatesNewUsers
 
             $team = Team::create(['name' => $input['shop_name']]);
             $user->teams()->attach($team);
+            $user->switchTeam($team);
 
-            // The person who signs up runs their shop. Phase 4 replaces this
-            // flag with the "owner" role.
-            $user->forceFill([
-                'is_admin' => true,
-                'current_team_id' => $team->id,
-            ])->save();
+            // The person who signs up owns the shop.
+            $user->setTeamRole($team, Roles::OWNER);
 
             return $user;
         });

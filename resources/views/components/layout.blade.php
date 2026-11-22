@@ -3,14 +3,19 @@
 @php
     $team = app(\App\Support\CurrentTeam::class)->get();
 
+    $user = auth()->user();
+
     // label => [route, icon, is this the current section?, optional badge]
-    $navigation = [
+    // Items the user's role can't use are left out.
+    $navigation = array_filter([
         'Dashboard' => [route('dashboard'), 'home', request()->routeIs('dashboard'), null],
         'Products' => [route('products.index'), 'box', request()->routeIs('products.*') && ! request()->routeIs('products.trash', 'products.import*'), null],
         'Categories' => [route('categories.index'), 'tag', request()->routeIs('categories.*'), null],
-        'Import' => [route('products.import'), 'upload', request()->routeIs('products.import*'), null],
-        'Trash' => [route('products.trash'), 'trash', request()->routeIs('products.trash'), $trashCount ?? 0],
-    ];
+        'Import' => $user->can('import', App\Models\Product::class)
+            ? [route('products.import'), 'upload', request()->routeIs('products.import*'), null] : null,
+        'Trash' => $user->can('viewTrash', App\Models\Product::class)
+            ? [route('products.trash'), 'trash', request()->routeIs('products.trash'), $trashCount ?? 0] : null,
+    ]);
 @endphp
 
 <!DOCTYPE html>

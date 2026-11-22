@@ -16,7 +16,8 @@ class IndexProductRequest extends FormRequest
     protected $redirectRoute = 'products.index';
 
     /**
-     * Access is already restricted to admins by the route middleware.
+     * This request is shared by the list, export and trash pages, which need
+     * different permissions, so each controller action authorizes itself.
      */
     public function authorize(): bool
     {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\StockMovementResource;
+use App\Models\Product;
 use App\Services\DashboardService;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
@@ -37,6 +38,8 @@ class DashboardController extends Controller
     )]
     public function __invoke(DashboardService $dashboard): JsonResponse
     {
+        $this->authorize('viewAny', Product::class);
+
         return response()->json([
             'totals' => $dashboard->totals(),
             'products_per_category' => CategoryResource::collection($dashboard->productsPerCategory()),

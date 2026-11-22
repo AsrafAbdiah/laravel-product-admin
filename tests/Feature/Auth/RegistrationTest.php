@@ -43,7 +43,7 @@ class RegistrationTest extends TestCase
         $this->assertAuthenticatedAs($user);
         $this->assertTrue($user->belongsToTeam($team));
         $this->assertSame($team->id, $user->current_team_id);
-        $this->assertTrue($user->is_admin);
+        $this->assertSame('owner', $user->teamRole($team));
     }
 
     #[Test]

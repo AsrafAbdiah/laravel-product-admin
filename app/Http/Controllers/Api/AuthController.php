@@ -49,10 +49,8 @@ class AuthController extends Controller
             ]);
         }
 
-        if (! $user->is_admin) {
-            abort(403, 'Only administrators can access this resource.');
-        }
-
+        // Any team member may get a token; what they can do with it is
+        // decided per request by their role in the current team.
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([

@@ -25,6 +25,8 @@ class ProductController extends Controller
 
     public function index(IndexProductRequest $request): View
     {
+        $this->authorize('viewAny', Product::class);
+
         return view('products.index', [
             'products' => $this->products->paginate($request->filters()),
             'categories' => $this->categories(),
@@ -34,6 +36,8 @@ class ProductController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Product::class);
+
         return view('products.create', [
             'product' => new Product,
             'categories' => $this->categories(),
@@ -49,6 +53,8 @@ class ProductController extends Controller
 
     public function show(Product $product): View
     {
+        $this->authorize('view', $product);
+
         return view('products.show', [
             'product' => $product->load('category:id,name'),
             'movements' => $this->products->stockHistory($product),
@@ -57,6 +63,8 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
+        $this->authorize('update', $product);
+
         return view('products.edit', [
             'product' => $product,
             'categories' => $this->categories(),
@@ -72,6 +80,8 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
+        $this->authorize('delete', $product);
+
         $this->products->delete($product);
 
         return redirect()->route('products.index')->with('success', 'Product moved to the trash.');
@@ -86,6 +96,8 @@ class ProductController extends Controller
 
     public function export(IndexProductRequest $request): BinaryFileResponse
     {
+        $this->authorize('export', Product::class);
+
         $fileName = 'products-'.now()->format('Ymd-His').'.xlsx';
 
         return Excel::download(new ProductsExport($this->products->query($request->filters())), $fileName);
@@ -93,6 +105,8 @@ class ProductController extends Controller
 
     public function importForm(): View
     {
+        $this->authorize('import', Product::class);
+
         return view('products.import', [
             'result' => session('import_result'),
         ]);
@@ -107,11 +121,15 @@ class ProductController extends Controller
 
     public function importTemplate(): BinaryFileResponse
     {
+        $this->authorize('import', Product::class);
+
         return Excel::download(new ProductsTemplateExport, 'product-import-template.xlsx');
     }
 
     public function trash(IndexProductRequest $request): View
     {
+        $this->authorize('viewTrash', Product::class);
+
         return view('products.trash', [
             'products' => $this->products->trashed($request->filters()),
             'filters' => $request->filters(),
@@ -120,6 +138,8 @@ class ProductController extends Controller
 
     public function restore(Product $product): RedirectResponse
     {
+        $this->authorize('restore', $product);
+
         $this->products->restore($product);
 
         return back()->with('success', "\"{$product->name}\" restored.");
@@ -127,6 +147,8 @@ class ProductController extends Controller
 
     public function forceDestroy(Product $product): RedirectResponse
     {
+        $this->authorize('forceDelete', $product);
+
         $name = $product->name;
 
         $this->products->forceDelete($product);

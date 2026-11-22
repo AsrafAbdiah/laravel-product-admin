@@ -13,6 +13,8 @@ class CategoryController extends Controller
 {
     public function index(): View
     {
+        $this->authorize('viewAny', Category::class);
+
         return view('categories.index', [
             'categories' => Category::withCount('products')->orderBy('name')->paginate(20),
         ]);
@@ -20,6 +22,8 @@ class CategoryController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Category::class);
+
         return view('categories.create', ['category' => new Category]);
     }
 
@@ -32,6 +36,8 @@ class CategoryController extends Controller
 
     public function edit(Category $category): View
     {
+        $this->authorize('update', $category);
+
         return view('categories.edit', ['category' => $category]);
     }
 
@@ -44,6 +50,8 @@ class CategoryController extends Controller
 
     public function destroy(Category $category): RedirectResponse
     {
+        $this->authorize('delete', $category);
+
         if ($category->hasProducts()) {
             return back()->with('error', "\"{$category->name}\" still has products. Move or permanently delete them first.");
         }
