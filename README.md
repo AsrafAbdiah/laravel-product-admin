@@ -6,7 +6,9 @@ Inventory management for small shops: a multi-tenant SaaS built with Laravel 13.
 
 Each shop (team) gets its own products, categories, stock history and members, fully isolated from other shops.
 
-![BandarOS dashboard](docs/screenshots/dashboard.jpg)
+![BandarOS demo: find low stock, restock a product, see it in the stock history and audit log](docs/screenshots/demo.gif)
+
+<sub>Demo: the dashboard flags low stock → filter the product list → restock an out-of-stock item → it's recorded in the stock history and the audit log → dark mode.</sub>
 
 <table>
   <tr>
