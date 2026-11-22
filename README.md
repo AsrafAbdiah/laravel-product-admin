@@ -1,8 +1,27 @@
 # BandarOS
 
+[![CI](https://github.com/AsrafAbdiah/laravel-product-admin/actions/workflows/ci.yml/badge.svg)](https://github.com/AsrafAbdiah/laravel-product-admin/actions/workflows/ci.yml)
+
 Inventory management for small shops: a multi-tenant SaaS built with Laravel 13.
 
 Each shop (team) gets its own products, categories, stock history and members, fully isolated from other shops.
+
+![BandarOS dashboard](docs/screenshots/dashboard.jpg)
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/products.jpg" alt="Product list with filters, stock badges and bulk actions"></td>
+    <td width="50%"><img src="docs/screenshots/team.jpg" alt="Team page with plan usage, members and roles"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/dashboard-dark.jpg" alt="Dashboard in dark mode"></td>
+    <td width="50%" align="center"><img src="docs/screenshots/mobile.jpg" alt="Product list on a phone" width="45%"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Products: filters, stock badges, bulk actions</sub></td>
+    <td align="center"><sub>Team: plan usage, members and roles · Dark mode · Mobile</sub></td>
+  </tr>
+</table>
 
 ## Features
 
