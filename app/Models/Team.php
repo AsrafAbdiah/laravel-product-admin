@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Activity as TeamActivity;
 use Database\Factories\TeamFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -46,7 +47,9 @@ class Team extends Model
 
     public function tapActivity(Activity $activity, string $eventName): void
     {
-        $activity->team_id = $this->id;
+        if ($activity instanceof TeamActivity) {
+            $activity->team_id = $this->id;
+        }
     }
 
     /**

@@ -28,7 +28,7 @@ class ProductService
      * Base query with filters applied and the category eager loaded
      * (only the columns we need), which avoids N+1 queries.
      *
-     * @param  array{status?: ?string, category_id?: ?int, search?: ?string}  $filters
+     * @param  array{status?: ?string, category_id?: ?int, search?: ?string, low_stock?: bool, sort?: ?string, per_page?: int}  $filters
      * @return Builder<Product>
      */
     public function query(array $filters = []): Builder

@@ -1,0 +1,13 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+        - config
+        - database
+        - routes
+
+    # 0 (loosest) to 10 (strictest). Level 5 checks types of arguments
+    # passed to methods and functions, on top of the basics.
+    level: 5

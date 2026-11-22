@@ -27,7 +27,7 @@ class TeamInvitationNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $team = $this->invitation->team;
-        $inviter = $this->invitation->inviter?->name ?? 'Someone';
+        $inviter = $this->invitation->inviter->name ?? 'Someone';
 
         return (new MailMessage)
             ->subject("Join {$team->name} on ".config('app.name'))

@@ -9,6 +9,8 @@ use Spatie\Activitylog\Models\Activity as SpatieActivity;
  * An audit log entry ("who did what, when"), scoped to the current team
  * like products and categories. New entries get the current team's id
  * unless the code logging them sets one explicitly.
+ *
+ * @property int|null $team_id
  */
 class Activity extends SpatieActivity
 {

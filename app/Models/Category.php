@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Activity as TeamActivity;
 use App\Models\Concerns\BelongsToTeam;
 use Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -12,6 +13,9 @@ use Spatie\Activitylog\Contracts\Activity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+/**
+ * @property int $team_id
+ */
 #[Fillable(['name'])]
 class Category extends Model
 {
@@ -30,7 +34,9 @@ class Category extends Model
 
     public function tapActivity(Activity $activity, string $eventName): void
     {
-        $activity->team_id = $this->team_id;
+        if ($activity instanceof TeamActivity) {
+            $activity->team_id = $this->team_id;
+        }
     }
 
     /**

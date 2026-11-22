@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
     title: 'BandarOS API',
     description: 'REST API for BandarOS, inventory for small shops. Every endpoint except login needs a Bearer token: call POST /api/login (or create one under Account settings > API tokens), then click "Authorize" and paste it. Requests work on your current shop. What you may do depends on your role there (owner, admin, staff, viewer) and on the token: read-only tokens get 403 on anything that changes data.',
 )]
-#[OA\Server(url: L5_SWAGGER_CONST_HOST, description: 'Local server')]
+#[OA\Server(url: '/', description: 'This server')]
 #[OA\SecurityScheme(
     securityScheme: 'sanctum',
     type: 'http',

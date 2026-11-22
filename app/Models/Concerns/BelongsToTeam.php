@@ -33,7 +33,9 @@ trait BelongsToTeam
         });
 
         static::creating(function (Model $model) {
-            $model->team_id ??= app(CurrentTeam::class)->id();
+            if ($model->getAttribute('team_id') === null) {
+                $model->setAttribute('team_id', app(CurrentTeam::class)->id());
+            }
         });
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Activity as TeamActivity;
 use App\Models\Concerns\BelongsToTeam;
 use App\Observers\ProductObserver;
 use Database\Factories\ProductFactory;
@@ -19,6 +20,9 @@ use Spatie\Activitylog\Contracts\Activity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+/**
+ * @property int $team_id
+ */
 // "image_path" is fillable for the service, but no Form Request accepts it,
 // so a client can't point a product at an arbitrary file.
 #[Fillable(['category_id', 'name', 'description', 'image_path', 'price', 'stock', 'enabled'])]
@@ -51,7 +55,9 @@ class Product extends Model
      */
     public function tapActivity(Activity $activity, string $eventName): void
     {
-        $activity->team_id = $this->team_id;
+        if ($activity instanceof TeamActivity) {
+            $activity->team_id = $this->team_id;
+        }
     }
 
     /**

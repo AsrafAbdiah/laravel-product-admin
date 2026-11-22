@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * One change to a product's stock level. Rows are only ever inserted,
  * never edited, so there is no updated_at column.
+ *
+ * @property int $team_id
  */
 #[Fillable(['team_id', 'product_id', 'user_id', 'old_stock', 'new_stock', 'change', 'reason'])]
 class StockMovement extends Model
