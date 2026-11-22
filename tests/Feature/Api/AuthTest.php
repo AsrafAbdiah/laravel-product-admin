@@ -67,7 +67,7 @@ class AuthTest extends TestCase
     #[Test]
     public function non_admin_with_a_token_is_forbidden(): void
     {
-        Sanctum::actingAs(User::factory()->create());
+        Sanctum::actingAs(User::factory()->create(), ['*']);
 
         $this->getJson('/api/products')->assertForbidden();
     }

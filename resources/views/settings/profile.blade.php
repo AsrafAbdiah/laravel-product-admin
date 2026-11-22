@@ -1,6 +1,9 @@
 <x-layout title="Account settings">
     <div class="mx-auto max-w-3xl space-y-6">
-        <x-ui.page-header title="Account settings" description="Your profile, password and sign-in security." />
+        <div>
+            <x-ui.page-header title="Account settings" description="Your profile, password and sign-in security." />
+            @include('settings._tabs')
+        </div>
 
         {{-- Profile --}}
         <x-ui.card title="Profile">

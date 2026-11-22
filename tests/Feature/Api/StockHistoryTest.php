@@ -22,7 +22,7 @@ class StockHistoryTest extends TestCase
         parent::setUp();
 
         $this->admin = User::factory()->admin()->create();
-        Sanctum::actingAs($this->admin);
+        Sanctum::actingAs($this->admin, ['*']);
     }
 
     #[Test]

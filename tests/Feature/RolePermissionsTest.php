@@ -83,7 +83,7 @@ class RolePermissionsTest extends TestCase
         $action = $this->dataName();
 
         foreach (self::ALL as $role) {
-            Sanctum::actingAs(User::factory()->withRole($role)->create());
+            Sanctum::actingAs(User::factory()->withRole($role)->create(), ['*']);
 
             $status = $this->perform($action)->getStatusCode();
 
@@ -108,7 +108,7 @@ class RolePermissionsTest extends TestCase
         $this->assertSame(Roles::OWNER, $user->teamRole($this->defaultTeam));
         $this->assertSame(Roles::VIEWER, $user->teamRole($otherTeam));
 
-        Sanctum::actingAs($user);
+        Sanctum::actingAs($user, ['*']);
         $this->postJson('/api/categories', ['name' => 'Mine'])->assertCreated();
 
         // Same user object, next request in the other team: must not reuse the owner role.

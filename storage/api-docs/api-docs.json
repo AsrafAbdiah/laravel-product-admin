@@ -1,8 +1,8 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Product Admin API",
-        "description": "RESTful API for managing products and categories. All endpoints except login require an admin Bearer token: call POST /api/login, then click \"Authorize\" and paste the token.",
+        "title": "BandarOS API",
+        "description": "REST API for BandarOS, inventory for small shops. Every endpoint except login needs a Bearer token: call POST /api/login (or create one under Account settings > API tokens), then click \"Authorize\" and paste it. Requests work on your current shop. What you may do depends on your role there (owner, admin, staff, viewer) and on the token: read-only tokens get 403 on anything that changes data.",
         "version": "1.0.0"
     },
     "servers": [
@@ -17,7 +17,7 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Log in as admin and receive a Bearer token",
+                "summary": "Log in and receive a Bearer token (full access, limited by your role)",
                 "operationId": "222b2625838e3c57e017987f73598fda",
                 "requestBody": {
                     "required": true,
@@ -83,9 +83,6 @@
                             }
                         }
                     },
-                    "403": {
-                        "$ref": "#/components/responses/Forbidden"
-                    },
                     "422": {
                         "$ref": "#/components/responses/ValidationFailed"
                     },
@@ -100,7 +97,7 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Get the currently authenticated admin",
+                "summary": "Get the currently authenticated user",
                 "operationId": "8367feff40ba10e43187792cad3132c1",
                 "responses": {
                     "200": {
@@ -1664,14 +1661,14 @@
                 }
             },
             "Forbidden": {
-                "description": "Authenticated user is not an admin",
+                "description": "Your role, or this token, does not allow this action",
                 "content": {
                     "application/json": {
                         "schema": {
                             "properties": {
                                 "message": {
                                     "type": "string",
-                                    "example": "Only administrators can access this resource."
+                                    "example": "This action is unauthorized."
                                 }
                             },
                             "type": "object"
@@ -1734,7 +1731,7 @@
     "tags": [
         {
             "name": "Auth",
-            "description": "Admin login and logout"
+            "description": "Login and logout"
         },
         {
             "name": "Dashboard",

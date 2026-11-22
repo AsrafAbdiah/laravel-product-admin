@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureTokenCanAct;
 use App\Http\Middleware\SetCurrentTeam;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'team' => SetCurrentTeam::class,
+            'token.ability' => EnsureTokenCanAct::class,
         ]);
 
         // The team must be known before route model binding looks up

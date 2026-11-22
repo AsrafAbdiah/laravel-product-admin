@@ -21,7 +21,7 @@ class ProductImageTest extends TestCase
         parent::setUp();
 
         Storage::fake('public');
-        Sanctum::actingAs(User::factory()->admin()->create());
+        Sanctum::actingAs(User::factory()->admin()->create(), ['*']);
     }
 
     /**

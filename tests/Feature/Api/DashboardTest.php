@@ -39,7 +39,7 @@ class DashboardTest extends TestCase
     #[Test]
     public function totals_are_calculated_correctly(): void
     {
-        Sanctum::actingAs($this->admin);
+        Sanctum::actingAs($this->admin, ['*']);
 
         $this->getJson('/api/dashboard')
             ->assertOk()
@@ -55,7 +55,7 @@ class DashboardTest extends TestCase
     #[Test]
     public function lists_categories_low_stock_products_and_recent_changes(): void
     {
-        Sanctum::actingAs($this->admin);
+        Sanctum::actingAs($this->admin, ['*']);
 
         $this->getJson('/api/dashboard')
             ->assertOk()
@@ -70,7 +70,7 @@ class DashboardTest extends TestCase
     #[Test]
     public function the_dashboard_uses_a_fixed_number_of_queries(): void
     {
-        Sanctum::actingAs($this->admin);
+        Sanctum::actingAs($this->admin, ['*']);
         Product::factory()->count(30)->create();
 
         $queries = 0;
@@ -107,7 +107,7 @@ class DashboardTest extends TestCase
         $this->get('/dashboard')->assertRedirect('/login');
         $this->getJson('/api/dashboard')->assertUnauthorized();
 
-        Sanctum::actingAs(User::factory()->create());
+        Sanctum::actingAs(User::factory()->create(), ['*']);
         $this->getJson('/api/dashboard')->assertForbidden();
     }
 }

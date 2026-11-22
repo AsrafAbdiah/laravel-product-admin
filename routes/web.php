@@ -17,6 +17,9 @@ Route::redirect('/', '/dashboard');
 // pages is decided by policies, from their role in the current team.
 Route::middleware(['auth', 'verified', 'team'])->group(function () {
     Route::get('/settings/profile', [SettingsController::class, 'profile'])->name('settings.profile');
+    Route::get('/settings/tokens', [SettingsController::class, 'tokens'])->name('settings.tokens');
+    Route::post('/settings/tokens', [SettingsController::class, 'storeToken'])->name('settings.tokens.store');
+    Route::delete('/settings/tokens/{tokenId}', [SettingsController::class, 'destroyToken'])->whereNumber('tokenId')->name('settings.tokens.destroy');
 
     // The current team: members, roles and invitations.
     Route::get('/team', [TeamController::class, 'show'])->name('team.show');

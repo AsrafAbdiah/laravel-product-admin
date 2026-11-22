@@ -30,7 +30,7 @@ class ImportTest extends TestCase
         parent::setUp();
 
         $this->admin = User::factory()->admin()->create();
-        Sanctum::actingAs($this->admin);
+        Sanctum::actingAs($this->admin, ['*']);
 
         Category::factory()->create(['name' => 'Electronics']);
         Category::factory()->create(['name' => 'Books']);

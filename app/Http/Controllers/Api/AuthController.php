@@ -15,7 +15,7 @@ class AuthController extends Controller
 {
     #[OA\Post(
         path: '/api/login',
-        summary: 'Log in as admin and receive a Bearer token',
+        summary: 'Log in and receive a Bearer token (full access, limited by your role)',
         tags: ['Auth'],
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(
             required: ['email', 'password'],
@@ -34,7 +34,6 @@ class AuthController extends Controller
                     new OA\Property(property: 'email', type: 'string', example: 'admin@example.com'),
                 ], type: 'object'),
             ])),
-            new OA\Response(ref: '#/components/responses/Forbidden', response: 403),
             new OA\Response(ref: '#/components/responses/ValidationFailed', response: 422),
             new OA\Response(response: 429, description: 'Too many login attempts'),
         ],
@@ -62,7 +61,7 @@ class AuthController extends Controller
 
     #[OA\Get(
         path: '/api/me',
-        summary: 'Get the currently authenticated admin',
+        summary: 'Get the currently authenticated user',
         security: [['sanctum' => []]],
         tags: ['Auth'],
         responses: [

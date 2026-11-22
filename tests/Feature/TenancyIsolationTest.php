@@ -69,7 +69,7 @@ class TenancyIsolationTest extends TestCase
     #[Test]
     public function the_product_list_and_dashboard_only_show_my_team(): void
     {
-        Sanctum::actingAs($this->me);
+        Sanctum::actingAs($this->me, ['*']);
 
         $this->getJson('/api/products')->assertOk()->assertJsonPath('meta.total', 2)->assertJsonMissing(['name' => 'Secret Product']);
         $categoryIds = $this->getJson('/api/categories')->assertOk()->json('data.*.id');
@@ -81,7 +81,7 @@ class TenancyIsolationTest extends TestCase
     #[Test]
     public function another_teams_product_is_not_found_on_any_endpoint(): void
     {
-        Sanctum::actingAs($this->me);
+        Sanctum::actingAs($this->me, ['*']);
         $id = $this->otherProduct->id;
 
         $this->getJson("/api/products/{$id}")->assertNotFound();
@@ -108,7 +108,7 @@ class TenancyIsolationTest extends TestCase
     #[Test]
     public function another_teams_category_is_not_found(): void
     {
-        Sanctum::actingAs($this->me);
+        Sanctum::actingAs($this->me, ['*']);
 
         $this->getJson("/api/categories/{$this->otherCategory->id}")->assertNotFound();
         $this->deleteJson("/api/categories/{$this->otherCategory->id}")->assertNotFound();
@@ -118,7 +118,7 @@ class TenancyIsolationTest extends TestCase
     #[Test]
     public function a_product_cannot_be_put_in_another_teams_category(): void
     {
-        Sanctum::actingAs($this->me);
+        Sanctum::actingAs($this->me, ['*']);
 
         $this->postJson('/api/products', [
             'category_id' => $this->otherCategory->id,
@@ -133,7 +133,7 @@ class TenancyIsolationTest extends TestCase
     #[Test]
     public function a_client_cannot_choose_the_team_of_a_new_product(): void
     {
-        Sanctum::actingAs($this->me);
+        Sanctum::actingAs($this->me, ['*']);
         $myCategory = Category::where('name', 'Books')->firstOrFail();
 
         $this->postJson('/api/products', [
@@ -150,7 +150,7 @@ class TenancyIsolationTest extends TestCase
     #[Test]
     public function bulk_delete_rejects_another_teams_ids(): void
     {
-        Sanctum::actingAs($this->me);
+        Sanctum::actingAs($this->me, ['*']);
 
         $this->deleteJson('/api/products/bulk', ['ids' => [$this->otherProduct->id]])->assertStatus(422);
 
@@ -160,7 +160,7 @@ class TenancyIsolationTest extends TestCase
     #[Test]
     public function category_names_only_need_to_be_unique_within_a_team(): void
     {
-        Sanctum::actingAs($this->me);
+        Sanctum::actingAs($this->me, ['*']);
 
         // "Books" exists in both teams already; a third "Books" in my team is refused.
         $this->postJson('/api/categories', ['name' => 'Books'])->assertStatus(422);
@@ -173,7 +173,7 @@ class TenancyIsolationTest extends TestCase
     public function trash_only_shows_my_teams_deleted_products(): void
     {
         $this->otherProduct->delete();
-        Sanctum::actingAs($this->me);
+        Sanctum::actingAs($this->me, ['*']);
 
         $this->getJson('/api/products/trash')->assertOk()->assertJsonPath('meta.total', 0);
     }
@@ -182,7 +182,7 @@ class TenancyIsolationTest extends TestCase
     public function export_only_contains_my_teams_products(): void
     {
         Excel::fake();
-        Sanctum::actingAs($this->me);
+        Sanctum::actingAs($this->me, ['*']);
 
         $this->get('/api/products/export')->assertOk();
 
@@ -193,7 +193,7 @@ class TenancyIsolationTest extends TestCase
     #[Test]
     public function import_does_not_match_another_teams_categories(): void
     {
-        Sanctum::actingAs($this->me);
+        Sanctum::actingAs($this->me, ['*']);
         $csv = "Name,Category,Description,Price,Stock,Status\nImported,Coffee,,5,5,enabled\n";
         $this->asTeam($this->otherTeam, fn () => Category::factory()->create(['name' => 'Coffee']));
 
@@ -210,7 +210,7 @@ class TenancyIsolationTest extends TestCase
         $loner = User::factory()->admin()->create();
         $loner->teams()->detach();
         $loner->forceFill(['current_team_id' => null])->save();
-        Sanctum::actingAs($loner->fresh());
+        Sanctum::actingAs($loner->fresh(), ['*']);
 
         $this->getJson('/api/products')->assertForbidden();
     }

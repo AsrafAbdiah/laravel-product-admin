@@ -18,7 +18,7 @@ class CategoryApiTest extends TestCase
     {
         parent::setUp();
 
-        Sanctum::actingAs(User::factory()->admin()->create());
+        Sanctum::actingAs(User::factory()->admin()->create(), ['*']);
     }
 
     #[Test]

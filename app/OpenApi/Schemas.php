@@ -106,8 +106,8 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\Response(
     response: 'Forbidden',
-    description: 'Authenticated user is not an admin',
-    content: new OA\JsonContent(properties: [new OA\Property(property: 'message', type: 'string', example: 'Only administrators can access this resource.')]),
+    description: 'Your role, or this token, does not allow this action',
+    content: new OA\JsonContent(properties: [new OA\Property(property: 'message', type: 'string', example: 'This action is unauthorized.')]),
 )]
 #[OA\Response(
     response: 'ValidationFailed',
