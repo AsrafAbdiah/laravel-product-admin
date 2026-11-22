@@ -22,6 +22,57 @@
             </x-ui.card>
         @endif
 
+        {{-- Plan and usage --}}
+        <x-ui.card title="Plan">
+            <x-slot:actions>
+                <x-ui.badge :tone="$team->plan === 'pro' ? 'brand' : 'neutral'">{{ $plans[$team->plan]['name'] }}</x-ui.badge>
+            </x-slot:actions>
+
+            <div class="grid gap-5 sm:grid-cols-2">
+                @foreach (['products' => 'Products', 'members' => 'Members & invitations'] as $key => $label)
+                    @php
+                        ['used' => $used, 'max' => $max] = $usage[$key];
+                        $percent = $max ? min(100, round($used / $max * 100)) : 0;
+                    @endphp
+                    <div>
+                        <div class="mb-1.5 flex justify-between text-sm">
+                            <span class="text-ink-muted">{{ $label }}</span>
+                            <span class="font-medium tabular-nums">{{ $used }} / {{ $max ?? 'Unlimited' }}</span>
+                        </div>
+                        @if ($max)
+                            <div class="h-2 rounded-full bg-surface-muted" aria-hidden="true">
+                                <div class="h-2 rounded-full {{ $percent >= 100 ? 'bg-danger' : ($percent >= 80 ? 'bg-warning' : 'bg-brand') }}" style="width: {{ $percent }}%"></div>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                @foreach ($plans as $key => $plan)
+                    <div @class(['rounded-lg border p-4', 'border-brand bg-brand-soft/40' => $team->plan === $key, 'border-line' => $team->plan !== $key])>
+                        <p class="font-semibold">{{ $plan['name'] }}</p>
+                        <ul class="mt-2 space-y-1 text-sm text-ink-muted">
+                            <li>{{ $plan['max_products'] ? 'Up to '.$plan['max_products'].' products' : 'Unlimited products' }}</li>
+                            <li>{{ $plan['max_members'] ? 'Up to '.$plan['max_members'].' members' : 'Unlimited members' }}</li>
+                            <li>{{ $plan['import'] ? 'Import from Excel / CSV' : 'No file import' }}</li>
+                        </ul>
+                        @can('managePlan', $team)
+                            @if ($team->plan !== $key)
+                                <form method="POST" action="{{ route('team.plan.update') }}" class="mt-3">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="plan" value="{{ $key }}">
+                                    <x-ui.button type="submit" size="sm" :variant="$key === 'pro' ? 'primary' : 'secondary'">Switch to {{ $plan['name'] }}</x-ui.button>
+                                </form>
+                            @endif
+                        @endcan
+                    </div>
+                @endforeach
+            </div>
+            <p class="mt-3 text-xs text-ink-subtle">Payments aren't connected yet, so switching plans is free.</p>
+        </x-ui.card>
+
         {{-- Members --}}
         <x-ui.card title="Members" :padding="false">
             <ul class="divide-y divide-line">

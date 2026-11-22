@@ -3,13 +3,15 @@
 namespace App\Http\Requests;
 
 use App\Models\Product;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class ImportProductRequest extends FormRequest
 {
-    public function authorize(): bool
+    public function authorize(): bool|Response
     {
-        return $this->user()->can('import', Product::class);
+        return Gate::inspect('import', Product::class);
     }
 
     /**

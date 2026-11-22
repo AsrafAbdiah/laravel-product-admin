@@ -20,6 +20,16 @@ class Team extends Model
     use HasFactory, LogsActivity;
 
     /**
+     * Mirror the database default, so a team created in this request
+     * already knows it's on the Free plan.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'plan' => 'free',
+    ];
+
+    /**
      * Audit log: renaming the shop or changing its plan.
      */
     public function getActivitylogOptions(): LogOptions

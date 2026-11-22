@@ -4,13 +4,19 @@ namespace App\Http\Requests;
 
 use App\Models\Product;
 use App\Support\TeamRule;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class StoreProductRequest extends FormRequest
 {
-    public function authorize(): bool
+    /**
+     * Returning the policy's Response (not just true/false) keeps its
+     * message, e.g. "Your Free plan allows up to 100 products...".
+     */
+    public function authorize(): bool|Response
     {
-        return $this->user()->can('create', Product::class);
+        return Gate::inspect('create', Product::class);
     }
 
     /**

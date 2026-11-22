@@ -4,10 +4,14 @@ namespace App\Policies;
 
 use App\Models\Team;
 use App\Models\User;
+use App\Support\PlanLimits;
 use App\Support\Roles;
+use Illuminate\Auth\Access\Response;
 
 class TeamPolicy
 {
+    public function __construct(private PlanLimits $limits) {}
+
     /**
      * Any member can see who else is in the team.
      */
@@ -27,6 +31,32 @@ class TeamPolicy
     public function update(User $user, Team $team): bool
     {
         return $this->manageMembers($user, $team);
+    }
+
+    /**
+     * Inviting needs the permission AND a free seat on the plan.
+     */
+    public function invite(User $user, Team $team): Response
+    {
+        if (! $this->manageMembers($user, $team)) {
+            return Response::deny();
+        }
+
+        if (! $this->limits->canAddMembers($team)) {
+            $max = $this->limits->plan($team)['max_members'];
+
+            return Response::deny("Your {$this->limits->plan($team)['name']} plan allows {$max} members (including pending invitations). The shop owner can upgrade to Pro.");
+        }
+
+        return Response::allow();
+    }
+
+    /**
+     * Only the owner chooses the plan.
+     */
+    public function managePlan(User $user, Team $team): bool
+    {
+        return $user->teamRole($team) === Roles::OWNER;
     }
 
     /**

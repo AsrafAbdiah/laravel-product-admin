@@ -94,7 +94,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // One member per role in the demo store, so each role can be tried out.
-        $demoShop = Team::create(['name' => 'BandarOS Demo Store']);
+        $demoShop = Team::create(['name' => 'BandarOS Demo Store', 'plan' => 'pro']);
         $this->seedShop($demoShop, [
             ['Admin', 'admin@example.com', Roles::OWNER],
             ['Aina (Manager)', 'manager@example.com', Roles::ADMIN],
@@ -111,7 +111,7 @@ class DatabaseSeeder extends Seeder
             'expires_at' => now()->addDays(TeamInvitation::VALID_FOR_DAYS),
         ]);
 
-        $secondShop = Team::create(['name' => 'Kedai Kopi Siti']);
+        $secondShop = Team::create(['name' => 'Kedai Kopi Siti', 'plan' => 'free']);
         $this->seedShop($secondShop, [
             ['Siti', 'siti@example.com', Roles::OWNER],
         ], self::SECOND_SHOP_CATALOGUE, withHistory: false);

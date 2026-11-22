@@ -23,7 +23,8 @@ abstract class TestCase extends BaseTestCase
         // Database tests run "inside" a default team, like a logged-in request,
         // so factories create data in the same team as the users acting on it.
         if (in_array(RefreshDatabase::class, class_uses_recursive(static::class), true)) {
-            $this->defaultTeam = Team::factory()->create(['name' => 'Test Shop']);
+            // On Pro so plan limits don't get in the way; plan tests use a Free team on purpose.
+            $this->defaultTeam = Team::factory()->create(['name' => 'Test Shop', 'plan' => 'pro']);
             app(CurrentTeam::class)->set($this->defaultTeam);
         }
     }

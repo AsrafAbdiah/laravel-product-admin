@@ -5,14 +5,19 @@ namespace App\Http\Requests;
 use App\Support\CurrentTeam;
 use App\Support\Roles;
 use Closure;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class InviteMemberRequest extends FormRequest
 {
-    public function authorize(): bool
+    /**
+     * Needs the team.manage permission and a free seat on the plan.
+     */
+    public function authorize(): bool|Response
     {
-        return $this->user()->can('manageMembers', app(CurrentTeam::class)->get());
+        return Gate::inspect('invite', app(CurrentTeam::class)->get());
     }
 
     /**

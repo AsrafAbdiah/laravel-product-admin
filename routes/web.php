@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified', 'team'])->group(function () {
     // The current team: members, roles and invitations.
     Route::get('/team', [TeamController::class, 'show'])->name('team.show');
     Route::put('/team', [TeamController::class, 'update'])->name('team.update');
+    Route::put('/team/plan', [TeamController::class, 'updatePlan'])->name('team.plan.update');
     Route::post('/team/invitations', [TeamController::class, 'invite'])->name('team.invitations.store');
     Route::delete('/team/invitations/{invitation}', [TeamController::class, 'cancelInvitation'])->name('team.invitations.destroy');
     Route::patch('/team/members/{member}', [TeamController::class, 'updateMember'])->name('team.members.update');

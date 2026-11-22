@@ -10,6 +10,15 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    {{-- Plan limit reached: explain why "New product" is missing --}}
+    @php $createCheck = Gate::inspect('create', App\Models\Product::class); @endphp
+    @if ($createCheck->denied() && auth()->user()->checkPermissionTo('products.create'))
+        <div class="mb-4 flex items-start gap-3 rounded-xl border border-warning/50 bg-warning-soft p-4 text-sm" role="status">
+            <x-ui.icon name="alert" class="mt-0.5 h-5 w-5 shrink-0 text-warning" />
+            <p class="text-ink">{{ $createCheck->message() }}</p>
+        </div>
+    @endif
+
     {{-- Filters --}}
     <form method="GET" action="{{ route('products.index') }}" class="mb-4 rounded-xl border border-line bg-surface p-4 shadow-xs">
         <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">

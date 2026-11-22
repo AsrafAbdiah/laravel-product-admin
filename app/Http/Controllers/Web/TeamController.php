@@ -9,6 +9,7 @@ use App\Models\TeamInvitation;
 use App\Models\User;
 use App\Services\TeamService;
 use App\Support\CurrentTeam;
+use App\Support\PlanLimits;
 use App\Support\Roles;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,7 +21,11 @@ use Illuminate\View\View;
  */
 class TeamController extends Controller
 {
-    public function __construct(private TeamService $teams, private CurrentTeam $currentTeam) {}
+    public function __construct(
+        private TeamService $teams,
+        private CurrentTeam $currentTeam,
+        private PlanLimits $limits,
+    ) {}
 
     public function show(): View
     {
@@ -32,7 +37,23 @@ class TeamController extends Controller
             'members' => $team->users()->orderBy('name')->get(),
             'roles' => $this->teams->memberRoles($team),
             'invitations' => $team->invitations()->with('inviter:id,name')->latest()->get(),
+            'plans' => $this->limits->plans(),
+            'usage' => $this->limits->usage($team),
         ]);
+    }
+
+    /**
+     * Switch between Free and Pro. No payment yet: the owner just picks.
+     */
+    public function updatePlan(Request $request): RedirectResponse
+    {
+        $team = $this->currentTeam->get();
+        $this->authorize('managePlan', $team);
+
+        $plan = $request->validate(['plan' => ['required', Rule::in(array_keys($this->limits->plans()))]])['plan'];
+        $team->update(['plan' => $plan]);
+
+        return back()->with('success', 'You are now on the '.$this->limits->plans()[$plan]['name'].' plan.');
     }
 
     public function update(Request $request): RedirectResponse
