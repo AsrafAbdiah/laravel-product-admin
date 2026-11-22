@@ -82,14 +82,17 @@
                 </button>
             </div>
 
-            <div class="flex items-center gap-3 rounded-lg px-3 py-2">
-                <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-soft text-sm font-semibold text-brand-ink">
-                    {{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
-                </span>
-                <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm font-medium">{{ auth()->user()->name }}</p>
-                    <p class="truncate text-xs text-ink-subtle">{{ auth()->user()->email }}</p>
-                </div>
+            <div class="flex items-center gap-1 rounded-lg">
+                <a href="{{ route('settings.profile') }}" title="Account settings"
+                   class="flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-2 hover:bg-surface-muted {{ request()->routeIs('settings.*') ? 'bg-surface-muted' : '' }}">
+                    <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-soft text-sm font-semibold text-brand-ink">
+                        {{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block truncate text-sm font-medium">{{ auth()->user()->name }}</span>
+                        <span class="block truncate text-xs text-ink-subtle">Account settings</span>
+                    </span>
+                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="rounded-lg p-1.5 text-ink-subtle hover:bg-surface-muted hover:text-danger" title="Log out" aria-label="Log out">

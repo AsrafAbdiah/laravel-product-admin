@@ -31,14 +31,15 @@ class ProductWebTest extends TestCase
     }
 
     #[Test]
-    public function non_admin_cannot_log_in_to_the_dashboard(): void
+    public function non_admin_can_log_in_but_cannot_open_the_dashboard(): void
     {
         $user = User::factory()->create(['password' => 'secret123']);
 
         $this->post('/login', ['email' => $user->email, 'password' => 'secret123'])
-            ->assertSessionHasErrors('email');
+            ->assertRedirect(route('dashboard'));
 
-        $this->assertGuest();
+        $this->assertAuthenticatedAs($user);
+        $this->get('/dashboard')->assertForbidden();
     }
 
     #[Test]

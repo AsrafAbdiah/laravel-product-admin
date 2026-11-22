@@ -1,21 +1,22 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\ProductController;
+use App\Http\Controllers\Web\SettingsController;
 use Illuminate\Support\Facades\Route;
+
+// Login, logout, sign-up, password reset, email verification and two-factor
+// routes come from Laravel Fortify (see config/fortify.php).
 
 Route::redirect('/', '/dashboard');
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'create'])->name('login');
-    Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:5,1');
+// Account settings: any verified user, whatever their role.
+Route::middleware(['auth', 'verified', 'team'])->group(function () {
+    Route::get('/settings/profile', [SettingsController::class, 'profile'])->name('settings.profile');
 });
 
-Route::middleware(['auth', 'team', 'admin'])->group(function () {
-    Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
-
+Route::middleware(['auth', 'verified', 'team', 'admin'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     // Declared before the resource routes so "bulk", "export" and "trash" are not mistaken for a product id.
