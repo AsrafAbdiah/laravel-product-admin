@@ -42,9 +42,10 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Give the user a role in a specific team (replacing any role they had there).
      */
-    public function setTeamRole(Team $team, string $role): void
+    public function setTeamRole(Team $team, ?string $role): void
     {
-        $this->inTeam($team, fn () => $this->syncRoles([$role]));
+        // A null role removes the user's role in that team.
+        $this->inTeam($team, fn () => $this->syncRoles($role === null ? [] : [$role]));
     }
 
     /**

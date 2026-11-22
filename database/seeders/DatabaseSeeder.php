@@ -5,11 +5,13 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Team;
+use App\Models\TeamInvitation;
 use App\Models\User;
 use App\Support\CurrentTeam;
 use App\Support\Roles;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 
 /**
  * Demo data: realistic products, a couple of weeks of stock history
@@ -99,6 +101,15 @@ class DatabaseSeeder extends Seeder
             ['Staff Member', 'staff@example.com', Roles::STAFF],
             ['Regular User', 'user@example.com', Roles::VIEWER],
         ], self::CATALOGUE, withHistory: true);
+
+        // A pending invitation, so the team page has one to show.
+        $demoShop->invitations()->create([
+            'email' => 'new.hire@example.com',
+            'role' => Roles::STAFF,
+            'token_hash' => TeamInvitation::hashToken(Str::random(48)),
+            'invited_by' => User::where('email', 'admin@example.com')->value('id'),
+            'expires_at' => now()->addDays(TeamInvitation::VALID_FOR_DAYS),
+        ]);
 
         $secondShop = Team::create(['name' => 'Kedai Kopi Siti']);
         $this->seedShop($secondShop, [

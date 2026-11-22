@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\InvitationController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\SettingsController;
+use App\Http\Controllers\Web\TeamController;
 use Illuminate\Support\Facades\Route;
 
 // Login, logout, sign-up, password reset, email verification and two-factor
@@ -15,6 +17,19 @@ Route::redirect('/', '/dashboard');
 // pages is decided by policies, from their role in the current team.
 Route::middleware(['auth', 'verified', 'team'])->group(function () {
     Route::get('/settings/profile', [SettingsController::class, 'profile'])->name('settings.profile');
+
+    // The current team: members, roles and invitations.
+    Route::get('/team', [TeamController::class, 'show'])->name('team.show');
+    Route::put('/team', [TeamController::class, 'update'])->name('team.update');
+    Route::post('/team/invitations', [TeamController::class, 'invite'])->name('team.invitations.store');
+    Route::delete('/team/invitations/{invitation}', [TeamController::class, 'cancelInvitation'])->name('team.invitations.destroy');
+    Route::patch('/team/members/{member}', [TeamController::class, 'updateMember'])->name('team.members.update');
+    Route::delete('/team/members/{member}', [TeamController::class, 'removeMember'])->name('team.members.destroy');
+    Route::post('/teams/{team}/switch', [TeamController::class, 'switch'])->name('teams.switch');
+
+    // Invitation links from emails.
+    Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');
+    Route::post('/invitations/{token}', [InvitationController::class, 'accept'])->name('invitations.accept');
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 

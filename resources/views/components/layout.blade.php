@@ -11,6 +11,7 @@
         'Dashboard' => [route('dashboard'), 'home', request()->routeIs('dashboard'), null],
         'Products' => [route('products.index'), 'box', request()->routeIs('products.*') && ! request()->routeIs('products.trash', 'products.import*'), null],
         'Categories' => [route('categories.index'), 'tag', request()->routeIs('categories.*'), null],
+        'Team' => [route('team.show'), 'users', request()->routeIs('team.*'), null],
         'Import' => $user->can('import', App\Models\Product::class)
             ? [route('products.import'), 'upload', request()->routeIs('products.import*'), null] : null,
         'Trash' => $user->can('viewTrash', App\Models\Product::class)
@@ -43,12 +44,34 @@
         </div>
 
         @if ($team)
-            <div class="mx-3 mb-3 flex items-center gap-2.5 rounded-lg border border-line bg-surface-muted px-3 py-2.5">
-                <x-ui.icon name="store" class="h-4 w-4 shrink-0 text-ink-muted" />
-                <div class="min-w-0">
-                    <p class="text-[11px] font-medium tracking-wide text-ink-subtle uppercase">Shop</p>
-                    <p class="truncate text-sm font-medium">{{ $team->name }}</p>
-                </div>
+            @php $otherTeams = $user->teams->reject(fn ($t) => $t->is($team)); @endphp
+            {{-- Current shop, with a switcher when the user belongs to more than one --}}
+            <div class="relative mx-3 mb-3" x-data="{ open: false }" @click.outside="open = false">
+                <button type="button" @click="open = !open" @if ($otherTeams->isEmpty()) disabled @endif
+                        class="flex w-full items-center gap-2.5 rounded-lg border border-line bg-surface-muted px-3 py-2.5 text-left enabled:hover:border-line-strong"
+                        :aria-expanded="open" aria-haspopup="true">
+                    <x-ui.icon name="store" class="h-4 w-4 shrink-0 text-ink-muted" />
+                    <span class="min-w-0 flex-1">
+                        <span class="block text-[11px] font-medium tracking-wide text-ink-subtle uppercase">Shop</span>
+                        <span class="block truncate text-sm font-medium">{{ $team->name }}</span>
+                    </span>
+                    @if ($otherTeams->isNotEmpty())
+                        <x-ui.icon name="switch" class="h-4 w-4 shrink-0 text-ink-subtle" />
+                    @endif
+                </button>
+
+                @if ($otherTeams->isNotEmpty())
+                    <div x-show="open" x-cloak x-transition.opacity
+                         class="absolute inset-x-0 top-full z-10 mt-1 rounded-lg border border-line bg-surface p-1 shadow-lg">
+                        <p class="px-2 py-1 text-[11px] font-medium tracking-wide text-ink-subtle uppercase">Switch to</p>
+                        @foreach ($otherTeams as $otherTeam)
+                            <form method="POST" action="{{ route('teams.switch', $otherTeam) }}">
+                                @csrf
+                                <button type="submit" class="w-full truncate rounded-md px-2 py-1.5 text-left text-sm hover:bg-surface-muted">{{ $otherTeam->name }}</button>
+                            </form>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         @endif
 
