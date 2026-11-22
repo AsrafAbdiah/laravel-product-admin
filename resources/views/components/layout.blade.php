@@ -14,6 +14,7 @@
         'Team' => [route('team.show'), 'users', request()->routeIs('team.*'), null],
         'Activity' => $team && $user->can('viewActivity', $team)
             ? [route('activity.index'), 'history', request()->routeIs('activity.*'), null] : null,
+        'Notifications' => [route('notifications.index'), 'bell', request()->routeIs('notifications.*'), $unreadCount ?? 0],
         'Import' => $user->can('import', App\Models\Product::class)
             ? [route('products.import'), 'upload', request()->routeIs('products.import*'), null] : null,
         'Trash' => $user->can('viewTrash', App\Models\Product::class)

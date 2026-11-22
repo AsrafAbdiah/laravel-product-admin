@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -15,7 +17,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['email', 'role', 'token_hash', 'invited_by', 'expires_at'])]
 class TeamInvitation extends Model
 {
+    use Prunable;
+
     public const VALID_FOR_DAYS = 7;
+
+    /**
+     * "php artisan model:prune" (scheduled daily) removes invitations that
+     * expired more than 30 days ago; recent ones stay so the team page can
+     * still show them as expired.
+     *
+     * @return Builder<static>
+     */
+    public function prunable(): Builder
+    {
+        return static::where('expires_at', '<', now()->subDays(30));
+    }
 
     /**
      * Get the attributes that should be cast.

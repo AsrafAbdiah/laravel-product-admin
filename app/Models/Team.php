@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Database\Factories\TeamFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Contracts\Activity;
 use Spatie\Activitylog\LogOptions;
@@ -72,6 +74,25 @@ class Team extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withTimestamps();
+    }
+
+    /**
+     * Members who have one of the given roles in this team, e.g. the
+     * owners and admins who should hear about low stock.
+     *
+     * @param  array<int, string>  $roles
+     * @return EloquentCollection<int, User>
+     */
+    public function membersWithRole(array $roles): EloquentCollection
+    {
+        $userIds = DB::table('model_has_roles')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.team_id', $this->id)
+            ->where('model_has_roles.model_type', (new User)->getMorphClass())
+            ->whereIn('roles.name', $roles)
+            ->pluck('model_has_roles.model_id');
+
+        return $this->users()->whereIn('users.id', $userIds)->get();
     }
 
     /**

@@ -93,6 +93,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Run queued work (low-stock alerts) straight away while seeding, so
+        // the demo already has notifications without a queue worker.
+        config(['queue.default' => 'sync']);
+
         // One member per role in the demo store, so each role can be tried out.
         $demoShop = Team::create(['name' => 'BandarOS Demo Store', 'plan' => 'pro']);
         $this->seedShop($demoShop, [

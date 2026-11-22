@@ -45,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
         // keeps that query out of the Blade template itself.
         View::composer('components.layout', function ($view) {
             $view->with('trashCount', auth()->check() ? Product::onlyTrashed()->count() : 0);
+            $view->with('unreadCount', auth()->check() ? auth()->user()->unreadNotifications()->count() : 0);
         });
     }
 }

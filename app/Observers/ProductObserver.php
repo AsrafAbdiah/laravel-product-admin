@@ -4,7 +4,10 @@ namespace App\Observers;
 
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Notifications\LowStockNotification;
+use App\Support\Roles;
 use Illuminate\Support\Facades\Context;
+use Illuminate\Support\Facades\Notification;
 
 /**
  * Records a stock movement whenever a product's stock changes, wherever
@@ -28,7 +31,16 @@ class ProductObserver
         }
 
         // Inside "updated", getOriginal() still holds the value from before the save.
-        $this->record($product, (int) $product->getOriginal('stock'), Context::get('stock_reason', StockMovement::REASON_UPDATED));
+        $oldStock = (int) $product->getOriginal('stock');
+        $this->record($product, $oldStock, Context::get('stock_reason', StockMovement::REASON_UPDATED));
+
+        // Alert only when stock *crosses* into low stock, not on every change below it.
+        if ($oldStock > Product::LOW_STOCK_THRESHOLD && $product->stock <= Product::LOW_STOCK_THRESHOLD) {
+            Notification::send(
+                $product->team->membersWithRole([Roles::OWNER, Roles::ADMIN]),
+                new LowStockNotification($product),
+            );
+        }
     }
 
     private function record(Product $product, int $oldStock, string $reason): void

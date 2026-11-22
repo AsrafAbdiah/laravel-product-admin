@@ -13,6 +13,7 @@ use App\Http\Resources\ProductResource;
 use App\Http\Resources\StockMovementResource;
 use App\Models\Product;
 use App\Services\ProductService;
+use App\Support\CurrentTeam;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Maatwebsite\Excel\Facades\Excel;
@@ -201,9 +202,16 @@ class ProductController extends Controller
             new OA\Response(ref: '#/components/responses/Forbidden', response: 403),
         ],
     )]
-    public function export(IndexProductRequest $request): BinaryFileResponse
+    public function export(IndexProductRequest $request): BinaryFileResponse|JsonResponse
     {
         $this->authorize('export', Product::class);
+
+        // Big exports are built in the background; the user is notified when ready.
+        if ($this->products->shouldQueueExport($request->filters())) {
+            $this->products->queueExport($request->filters(), app(CurrentTeam::class)->get(), $request->user());
+
+            return response()->json(['message' => 'The export is being prepared. You will be notified when it is ready to download.'], 202);
+        }
 
         $fileName = 'products-'.now()->format('Ymd-His').'.xlsx';
 
@@ -238,6 +246,13 @@ class ProductController extends Controller
     )]
     public function import(ImportProductRequest $request): JsonResponse
     {
+        // Big files are imported in the background; the user is notified with the result.
+        if ($this->products->shouldQueueImport($request->file('file'))) {
+            $this->products->queueImport($request->file('file'), app(CurrentTeam::class)->get(), $request->user());
+
+            return response()->json(['message' => 'The file is being imported in the background. You will be notified when it is done.'], 202);
+        }
+
         $result = $this->products->import($request->file('file'));
 
         return response()->json([

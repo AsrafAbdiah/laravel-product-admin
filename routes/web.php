@@ -3,7 +3,9 @@
 use App\Http\Controllers\Web\ActivityController;
 use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\ExportController;
 use App\Http\Controllers\Web\InvitationController;
+use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\TeamController;
@@ -35,6 +37,12 @@ Route::middleware(['auth', 'verified', 'team'])->group(function () {
     Route::post('/teams/{team}/switch', [TeamController::class, 'switch'])->name('teams.switch');
 
     Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
+
+    Route::get('/exports/{fileId}', [ExportController::class, 'download'])->whereUuid('fileId')->name('exports.download');
+
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::get('/notifications/{id}', [NotificationController::class, 'show'])->whereUuid('id')->name('notifications.show');
 
     // Invitation links from emails.
     Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');

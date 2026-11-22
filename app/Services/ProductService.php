@@ -4,13 +4,18 @@ namespace App\Services;
 
 use App\Exceptions\ProductNotInTrashException;
 use App\Imports\ProductsImport;
+use App\Jobs\ExportProductsJob;
+use App\Jobs\ImportProductsJob;
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Models\Team;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 /**
@@ -109,11 +114,65 @@ class ProductService
      */
     public function import(UploadedFile $file): array
     {
+        return $this->runImport($file, null, $file->getClientOriginalName());
+    }
+
+    /**
+     * Same as import(), for a file saved earlier (queued imports).
+     *
+     * @return array{imported: int, failed: array<int, array{row: int, errors: array<int, string>}>}
+     */
+    public function importStoredFile(string $path, string $disk, string $originalName): array
+    {
+        return $this->runImport($path, $disk, $originalName);
+    }
+
+    /**
+     * Is this upload big enough to import in the background?
+     */
+    public function shouldQueueImport(UploadedFile $file): bool
+    {
+        return $file->getSize() > config('bandaros.queue_imports_over_kb') * 1024;
+    }
+
+    /**
+     * Save the upload privately and import it on the queue.
+     */
+    public function queueImport(UploadedFile $file, Team $team, User $user): void
+    {
+        $path = $file->storeAs("imports/{$team->id}", Str::uuid().'.'.$file->getClientOriginalExtension(), 'local');
+
+        ImportProductsJob::dispatch($team->id, $user->id, $path, $file->getClientOriginalName());
+    }
+
+    /**
+     * Is this export big enough to build in the background?
+     *
+     * @param  array<string, mixed>  $filters
+     */
+    public function shouldQueueExport(array $filters): bool
+    {
+        return $this->query($filters)->count() > config('bandaros.queue_exports_over_rows');
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    public function queueExport(array $filters, Team $team, User $user): void
+    {
+        ExportProductsJob::dispatch($team->id, $user->id, $filters, (string) Str::uuid());
+    }
+
+    /**
+     * @return array{imported: int, failed: array<int, array{row: int, errors: array<int, string>}>}
+     */
+    private function runImport(UploadedFile|string $file, ?string $disk, string $fileName): array
+    {
         $import = new ProductsImport;
 
         // One audit entry for the whole import rather than one per row.
         activity()->withoutLogs(fn () => Context::scope(
-            fn () => Excel::import($import, $file),
+            fn () => Excel::import($import, $file, $disk),
             ['stock_reason' => StockMovement::REASON_IMPORTED],
         ));
 
@@ -124,8 +183,8 @@ class ProductService
 
         activity('products')
             ->event('imported')
-            ->withProperties(['file' => $file->getClientOriginalName(), 'imported' => $result['imported'], 'skipped' => count($result['failed'])])
-            ->log("imported {$result['imported']} products from {$file->getClientOriginalName()}");
+            ->withProperties(['file' => $fileName, 'imported' => $result['imported'], 'skipped' => count($result['failed'])])
+            ->log("imported {$result['imported']} products from {$fileName}");
 
         return $result;
     }

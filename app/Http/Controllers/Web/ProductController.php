@@ -13,6 +13,7 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\ProductService;
+use App\Support\CurrentTeam;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -94,9 +95,16 @@ class ProductController extends Controller
         return back()->with('success', "{$deleted} product(s) moved to the trash.");
     }
 
-    public function export(IndexProductRequest $request): BinaryFileResponse
+    public function export(IndexProductRequest $request): BinaryFileResponse|RedirectResponse
     {
         $this->authorize('export', Product::class);
+
+        // Big exports are built in the background; the user is notified when ready.
+        if ($this->products->shouldQueueExport($request->filters())) {
+            $this->products->queueExport($request->filters(), app(CurrentTeam::class)->get(), $request->user());
+
+            return back()->with('success', "Your export is being prepared. We'll notify you when it's ready to download.");
+        }
 
         $fileName = 'products-'.now()->format('Ymd-His').'.xlsx';
 
@@ -114,6 +122,13 @@ class ProductController extends Controller
 
     public function import(ImportProductRequest $request): RedirectResponse
     {
+        if ($this->products->shouldQueueImport($request->file('file'))) {
+            $this->products->queueImport($request->file('file'), app(CurrentTeam::class)->get(), $request->user());
+
+            return redirect()->route('products.import')
+                ->with('success', "Big file! We're importing it in the background and will notify you when it's done.");
+        }
+
         $result = $this->products->import($request->file('file'));
 
         return redirect()->route('products.import')->with('import_result', $result);
