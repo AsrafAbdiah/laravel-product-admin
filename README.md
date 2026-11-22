@@ -1,138 +1,78 @@
-# Laravel Product Admin
+# BandarOS
 
-Product and stock management app built with Laravel 13 and MySQL. It has an admin dashboard (Blade + Tailwind) and a REST API (Sanctum). Only admin users can access either one.
+Inventory management for small shops: a multi-tenant SaaS built with Laravel 13.
+
+Each shop (team) gets its own products, categories, stock history and members, fully isolated from other shops.
 
 ## Features
 
-- **Dashboard:** product totals, low-stock alerts, inventory value, products per category and recent stock changes
-- **Products:** create, edit, view, delete, with an image per product
-- **Search, filter and sort:** by status, category, low stock, name, price, stock or date, with pagination
-- **Bulk delete** and a **trash** where deleted products can be restored or deleted forever
-- **Stock history:** every stock change is logged with who made it and why
-- **Excel/CSV import** (with per-row error reporting) and **Excel export**
-- **Categories:** create, rename and delete (blocked while products still use them)
-- **REST API** for all of the above, documented with Swagger
+- **Inventory:** products with images, categories, search, filters and sorting; trash with restore; stock history; Excel/CSV import and export
+- **Teams and roles:** sign up creates your shop; invite members by email; Owner, Admin, Staff and Viewer roles (spatie/laravel-permission in teams mode); switch between shops
+- **Security:** two-factor login, email verification, password reset (Fortify); nonce-based Content-Security-Policy and security headers; session management; per-team API rate limits; audit log of every change
+- **Automation:** low-stock alerts (in-app and email), background imports and exports, weekly stock summary email, scheduled clean-up
+- **Plans:** Free (100 products, 2 members, no import) and Pro (unlimited); payments not connected yet
+- **REST API** with Sanctum tokens (read-only or read-write), documented with Swagger at `/api/documentation`
+- **UI:** sidebar app shell, dark mode, toasts, confirm dialogs, mobile layouts (Blade, Tailwind 4, Alpine.js)
 
-## Requirements
+## Getting started
 
-- PHP 8.3+ (with the `gd`, `zip`, `pdo_mysql` and `fileinfo` extensions)
-- Composer
-- MySQL
-- Node.js + npm
-
-## Setup
+Requirements: PHP 8.3+ (gd, zip, intl, pdo_mysql, fileinfo), Composer, MySQL/MariaDB, Node 20+.
 
 ```bash
-git clone https://github.com/AsrafAbdiah/laravel-product-admin.git
-cd laravel-product-admin
-
 composer install
-npm install
-
-cp .env.example .env
-php artisan key:generate
-```
-
-Create a MySQL database named `laravel_product_admin` (or change `DB_*` in `.env`), then:
-
-```bash
+npm install && npm run build
+cp .env.example .env && php artisan key:generate
+# create a MySQL database "laravel_product_admin" (or edit DB_* in .env)
 php artisan migrate --seed
 php artisan storage:link
-npm run build
 php artisan l5-swagger:generate
 php artisan serve
 ```
 
-Open http://localhost:8000
+For background work and scheduled tasks, also run `php artisan queue:work` and `php artisan schedule:work`. Emails go to `storage/logs/laravel.log` locally.
 
-**Login:** `admin@example.com` / `password`
+### Demo accounts (password: `password`)
 
-A non-admin account (`user@example.com` / `password`) is also seeded for testing access control. The seeder adds around 30 realistic products with two weeks of stock history, so every page has data to show.
+| Email | Shop | Role |
+|---|---|---|
+| admin@example.com | BandarOS Demo Store (Pro) | Owner |
+| manager@example.com | BandarOS Demo Store | Admin |
+| staff@example.com | BandarOS Demo Store | Staff |
+| user@example.com | BandarOS Demo Store | Viewer |
+| siti@example.com | Kedai Kopi Siti (Free) | Owner |
 
-`storage:link` makes uploaded product images reachable at `/storage/...`.
+## Roles
+
+| Permission | Owner | Admin | Staff | Viewer |
+|---|:-:|:-:|:-:|:-:|
+| View products, dashboard, export | ✓ | ✓ | ✓ | ✓ |
+| Create and edit products, import | ✓ | ✓ | ✓ | |
+| Delete, trash, categories | ✓ | ✓ | | |
+| Invite members, change roles, audit log | ✓ | ✓ | | |
+| Change the plan | ✓ | | | |
 
 ## API
 
-Get a token first:
+Log in with `POST /api/login` (or create a token under Account settings > API tokens) and send `Authorization: Bearer <token>`. Requests act on your current shop. Read-only tokens get 403 on anything that changes data. Full interactive docs are at `/api/documentation`.
 
-```
-POST /api/login
-{ "email": "admin@example.com", "password": "password" }
-```
+## How it works
 
-Then send `Authorization: Bearer <token>` and `Accept: application/json` with each request.
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/login` | Login, returns token |
-| POST | `/api/logout` | Logout |
-| GET | `/api/me` | Current user |
-| GET | `/api/dashboard` | Totals, products per category, low-stock products, recent stock changes |
-| GET | `/api/products` | List products. Filters: `status`, `category_id`, `search`, `low_stock`, `per_page`. Sort: `sort=price` / `sort=-price` (also `name`, `stock`, `created_at`) |
-| POST | `/api/products` | Create product (JSON, or multipart with an `image`) |
-| GET | `/api/products/{id}` | Product detail |
-| PUT | `/api/products/{id}` | Update product. Send `remove_image=1` to clear the image. To upload a new image, send `POST` with `_method=PUT` as multipart |
-| DELETE | `/api/products/{id}` | Move product to the trash (soft delete) |
-| DELETE | `/api/products/bulk` | Bulk delete, body: `{ "ids": [1, 2] }` |
-| GET | `/api/products/export` | Export to Excel (same filters as the list) |
-| POST | `/api/products/import` | Import from `.xlsx` or `.csv` (multipart, field `file`) |
-| GET | `/api/products/{id}/stock-movements` | Stock history for a product |
-| GET | `/api/products/trash` | Products in the trash |
-| PATCH | `/api/products/{id}/restore` | Restore from the trash |
-| DELETE | `/api/products/{id}/force` | Permanently delete (product must be in the trash) |
-| GET/POST | `/api/categories` | List (with product counts) / create categories |
-| GET/PUT/DELETE | `/api/categories/{id}` | View / rename / delete a category |
-
-Swagger docs: http://localhost:8000/api/documentation
-
-### Import file format
-
-First row is headings: **Name, Category, Description, Price, Stock, Status**.
-
-- **Category** must be an existing category name (not case-sensitive).
-- **Status** is `enabled` or `disabled` (blank means enabled).
-
-Valid rows are imported. Rows with problems are skipped and returned with their row number and errors. A file from "Export to Excel" can be imported again; its extra columns are ignored, and the rows are added as new products. The dashboard has a "Download template" link.
-
-## Tests
+- **Multi-tenancy:** a `BelongsToTeam` trait adds a global scope (`team_id = current team`) and fills `team_id` on new rows. `SetCurrentTeam` middleware sets the team for each request, and runs *before* route model binding, so another shop's records return 404. Validation rules are team-scoped too (`TeamRule`).
+- **Authorization:** policies check the role's permissions in the current team plus plan limits, and return clear "upgrade" messages.
+- **Stock history:** a model observer records every stock change; Laravel `Context` labels imports.
+- **Audit log:** spatie/laravel-activitylog, scoped per team.
+- **Tests:** 188 PHPUnit tests, including tenant-isolation and role-matrix suites. Pint and Larastan (level 5) run in CI (`.github/workflows/ci.yml`).
 
 ```bash
 php artisan test
+vendor/bin/pint --test
+vendor/bin/phpstan analyse
 ```
 
-Tests use an in-memory SQLite database and a fake storage disk, so they never touch real data or files.
+## Deploying
 
-## Design choices / assumptions
+Set `APP_URL`, `DB_*`, `MAIL_*` and `QUEUE_CONNECTION=database` in `.env`. Run `php artisan migrate --force`, `php artisan storage:link` and `php artisan optimize`; keep a queue worker running (e.g. Supervisor); add one cron entry: `* * * * * php artisan schedule:run`. Serve over HTTPS so HSTS is sent.
 
-**Structure**
-- `ProductService` holds the product logic so the API and dashboard controllers share it. `DashboardService` holds the dashboard queries.
-- Validation is done with Form Requests, and API output with API Resources.
+## Roadmap
 
-**Security**
-- Admin access is an `is_admin` flag on users, checked by an `admin` middleware. It's not mass-assignable.
-- The login endpoint is rate limited (5 attempts per minute).
-- Sorting only accepts whitelisted fields (validated in the Form Request), so user input never goes straight into `orderBy`.
-
-**Performance**
-- The category is eager loaded to avoid N+1 queries, and lists are paginated (max 100 per page).
-- The dashboard totals come from a single aggregate query (`COUNT` / `SUM`), so the dashboard costs the same number of queries however many products there are.
-- Bulk delete runs as a single query.
-- Export (`FromQuery`) and import (`WithChunkReading`) work in chunks, so large files aren't loaded into memory at once.
-
-**Data**
-- Price is stored as `DECIMAL(10,2)` and returned as a string to avoid rounding issues.
-- Products use soft deletes. "Delete forever" only works on products already in the trash (otherwise 409 Conflict), so nothing is lost with a single click. Images and stock history are removed only when a product is permanently deleted.
-- A category can't be deleted while any product uses it, **including products in the trash**, because their rows still exist and the foreign key (`restrictOnDelete`) would block it. The API returns 409 with an explanation instead of a database error.
-
-**Stock history**
-- Stock changes are recorded by a model observer (`ProductObserver`), so every path (API, dashboard, import) is covered without each one remembering to log.
-- The import labels its changes as `imported` through Laravel's `Context`, scoped to the import call only.
-
-**Images**
-- Images are stored on the `public` disk. When an image is replaced or removed, the old file is deleted only after the database update succeeds.
-
-**Exports**
-- Exports use `WithStrictNullComparison`; without it Laravel-Excel writes a stock of `0` as an empty cell. A round-trip test (export, then import) guards this.
-
-**Environment**
-- Developed on MariaDB (XAMPP), which is MySQL-compatible.
+Passkey login, Stripe billing for Pro, product variants, multi-location stock.
