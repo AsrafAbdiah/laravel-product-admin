@@ -32,6 +32,10 @@ class SetCurrentTeam
                 }
             }
 
+            // Fail closed: without a team, team-scoped queries would not be
+            // filtered, so a user with no team is not let in at all.
+            abort_if($team === null, Response::HTTP_FORBIDDEN, 'You are not a member of any team.');
+
             $this->currentTeam->set($team);
         }
 

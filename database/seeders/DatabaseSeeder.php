@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Team;
 use App\Models\User;
+use App\Support\CurrentTeam;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Date;
 
@@ -67,32 +69,67 @@ class DatabaseSeeder extends Seeder
     ];
 
     /**
+     * A second, smaller shop, so team isolation can be demonstrated.
+     *
+     * @var array<string, array<int, array{0: string, 1: float, 2: int, 3: string}>>
+     */
+    private const SECOND_SHOP_CATALOGUE = [
+        'Coffee' => [
+            ['House Blend Beans 500g', 45.00, 40, 'Medium roast, chocolate notes.'],
+            ['Single Origin Sabah 250g', 38.00, 6, 'Light roast from Tenom.'],
+            ['Cold Brew Bottle 1L', 18.50, 24, 'Ready to drink.'],
+        ],
+        'Bakery' => [
+            ['Butter Croissant', 7.50, 30, 'Baked fresh every morning.'],
+            ['Pandan Chiffon Cake', 32.00, 4, 'Whole cake, serves 8.'],
+        ],
+    ];
+
+    /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        $admin = User::factory()->admin()->create([
-            'name' => 'Admin',
-            'email' => 'admin@example.com',
-            'password' => 'password',
-        ]);
+        $demoShop = Team::create(['name' => 'BandarOS Demo Store']);
+        $this->seedShop($demoShop, [
+            ['Admin', 'admin@example.com', true],
+            // A normal user, handy for checking that non-admins are blocked.
+            ['Regular User', 'user@example.com', false],
+        ], self::CATALOGUE, withHistory: true);
 
-        // A normal user, handy for checking that non-admins are blocked.
-        User::factory()->create([
-            'name' => 'Regular User',
-            'email' => 'user@example.com',
-            'password' => 'password',
-        ]);
+        $secondShop = Team::create(['name' => 'Kedai Kopi Siti']);
+        $this->seedShop($secondShop, [
+            ['Siti', 'siti@example.com', true],
+        ], self::SECOND_SHOP_CATALOGUE, withHistory: false);
 
-        // Pretend the catalogue was set up two weeks ago by the admin, so the
+        app(CurrentTeam::class)->set(null);
+    }
+
+    /**
+     * Create a shop's members and products. Everything inside runs "as" that
+     * team, so BelongsToTeam fills in team_id automatically.
+     *
+     * @param  array<int, array{0: string, 1: string, 2: bool}>  $members  name, email, is admin
+     * @param  array<string, array<int, array{0: string, 1: float, 2: int, 3: string}>>  $catalogue
+     */
+    private function seedShop(Team $team, array $members, array $catalogue, bool $withHistory): void
+    {
+        app(CurrentTeam::class)->set($team);
+
+        $users = collect($members)->map(fn (array $member) => User::factory()
+            ->state(['is_admin' => $member[2]])
+            ->create(['name' => $member[0], 'email' => $member[1], 'password' => 'password']));
+        $owner = $users->first();
+
+        // Pretend the catalogue was set up two weeks ago by the owner, so the
         // stock history and "x days ago" labels look realistic. $today is
         // captured first because now() returns the frozen time afterwards.
         $today = now()->toImmutable();
         Date::setTestNow($today->subDays(14));
-        auth()->setUser($admin);
+        auth()->setUser($owner);
 
         $products = collect();
-        foreach (self::CATALOGUE as $categoryName => $items) {
+        foreach ($catalogue as $categoryName => $items) {
             $category = Category::create(['name' => $categoryName]);
 
             foreach ($items as [$name, $price, $stock, $description]) {
@@ -105,6 +142,13 @@ class DatabaseSeeder extends Seeder
                     'enabled' => true,
                 ]);
             }
+        }
+
+        if (! $withHistory) {
+            Date::setTestNow();
+            auth()->forgetUser();
+
+            return;
         }
 
         // A few products are hidden from the shop.

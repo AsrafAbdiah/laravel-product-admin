@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTeam;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,9 +11,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * One change to a product's stock level. Rows are only ever inserted,
  * never edited, so there is no updated_at column.
  */
-#[Fillable(['product_id', 'user_id', 'old_stock', 'new_stock', 'change', 'reason'])]
+#[Fillable(['team_id', 'product_id', 'user_id', 'old_stock', 'new_stock', 'change', 'reason'])]
 class StockMovement extends Model
 {
+    use BelongsToTeam;
+
     public const REASON_CREATED = 'created';
 
     public const REASON_UPDATED = 'updated';

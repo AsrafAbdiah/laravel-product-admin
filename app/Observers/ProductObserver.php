@@ -34,6 +34,8 @@ class ProductObserver
     private function record(Product $product, int $oldStock, string $reason): void
     {
         $product->stockMovements()->create([
+            // Always the product's own team, even when no team is set (seeders, queues).
+            'team_id' => $product->team_id,
             'user_id' => auth()->id(),
             'old_stock' => $oldStock,
             'new_stock' => $product->stock,

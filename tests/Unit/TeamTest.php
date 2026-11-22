@@ -32,7 +32,9 @@ class TeamTest extends TestCase
 
         $user->teams()->attach($teams);
 
-        $this->assertCount(2, $user->teams);
+        // The two new teams, plus the team every user starts in.
+        $this->assertCount(3, $user->teams);
+        $this->assertTrue($user->teams->contains($this->defaultTeam));
         $this->assertTrue($teams->first()->users->contains($user));
     }
 

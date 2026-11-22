@@ -20,6 +20,8 @@ class ProductFactory extends Factory
     {
         return [
             'category_id' => Category::factory(),
+            // A product always lives in the same team as its category.
+            'team_id' => fn (array $attributes) => Category::withoutGlobalScopes()->find($attributes['category_id'])?->team_id,
             'name' => ucfirst(fake()->words(3, true)),
             'description' => fake()->sentence(12),
             'price' => fake()->randomFloat(2, 5, 2000),
