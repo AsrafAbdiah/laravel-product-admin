@@ -37,8 +37,16 @@ class MarketingPagesTest extends TestCase
             ->assertDontSee('Go to dashboard');
     }
 
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function urls(): array
+    {
+        return array_map(fn (array $page) => [$page[0]], self::pages());
+    }
+
     #[Test]
-    #[DataProvider('pages')]
+    #[DataProvider('urls')]
     public function public_pages_send_the_strict_csp(string $url): void
     {
         $csp = $this->get($url)->headers->get('Content-Security-Policy');
