@@ -33,7 +33,8 @@ Each shop (team) gets its own products, categories, stock history and members, f
 - **Automation:** low-stock alerts (in-app and email), background imports and exports, weekly stock summary email, scheduled clean-up
 - **Plans:** Free (100 products, 2 members, no import) and Pro (unlimited); payments not connected yet
 - **REST API** with Sanctum tokens (read-only or read-write), documented with Swagger at `/api/documentation`
-- **UI:** sidebar app shell, dark mode, toasts, confirm dialogs, mobile layouts (Blade, Tailwind 4, Alpine.js)
+- **UI:** sidebar app shell, Ctrl+K command palette to jump to any page or product, dark mode, toasts, confirm dialogs, mobile layouts (Blade, Tailwind 4, Alpine.js)
+- **Onboarding:** a public website (landing page, pricing built from the real plan limits, terms, privacy) and a "Get your shop set up" checklist for new shops
 
 ## Getting started
 
@@ -82,7 +83,7 @@ Log in with `POST /api/login` (or create a token under Account settings > API to
 - **Authorization:** policies check the role's permissions in the current team plus plan limits, and return clear "upgrade" messages.
 - **Stock history:** a model observer records every stock change; Laravel `Context` labels imports.
 - **Audit log:** spatie/laravel-activitylog, scoped per team.
-- **Tests:** 188 PHPUnit tests, including tenant-isolation and role-matrix suites. Pint and Larastan (level 5) run in CI (`.github/workflows/ci.yml`).
+- **Tests:** 213 PHPUnit tests, including tenant-isolation and role-matrix suites. Pint and Larastan (level 5) run in CI (`.github/workflows/ci.yml`).
 
 ```bash
 php artisan test
