@@ -20,6 +20,9 @@
         'Trash' => $user->can('viewTrash', App\Models\Product::class)
             ? [route('products.trash'), 'trash', request()->routeIs('products.trash'), $trashCount ?? 0] : null,
     ]);
+
+    // Pages and actions for the Ctrl+K command palette, filtered by role.
+    $commands = app(\App\Support\CommandPalette::class)->commands($user, $team);
 @endphp
 
 <!DOCTYPE html>
@@ -77,6 +80,16 @@
                 @endif
             </div>
         @endif
+
+        <div class="mx-3 mb-3">
+            <button type="button" @click="sidebarOpen = false; $dispatch('open-command-palette')"
+                    class="flex w-full items-center gap-2.5 rounded-lg border border-line px-3 py-2 text-sm text-ink-subtle hover:border-line-strong hover:text-ink-muted">
+                <x-ui.icon name="search" class="h-4 w-4" />
+                <span class="flex-1 text-left">Search…</span>
+                <kbd class="rounded border border-line px-1.5 text-[11px] font-sans"
+                     x-data x-text="/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘K' : 'Ctrl K'">Ctrl K</kbd>
+            </button>
+        </div>
 
         <nav class="flex-1 space-y-1 overflow-y-auto px-3">
             @foreach ($navigation as $label => [$url, $icon, $active, $badge])
@@ -144,6 +157,10 @@
             @if ($team)
                 <span class="ml-auto truncate text-sm text-ink-muted">{{ $team->name }}</span>
             @endif
+            <button type="button" @click="$dispatch('open-command-palette')" @class(['rounded-lg p-1.5 text-ink-muted hover:bg-surface-muted', 'ml-auto' => ! $team])
+                    aria-label="Search">
+                <x-ui.icon name="search" />
+            </button>
         </header>
 
         <main id="main" class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
@@ -152,5 +169,6 @@
     </div>
 
     @include('partials.overlays')
+    @include('partials.command-palette', ['commands' => $commands])
 </body>
 </html>

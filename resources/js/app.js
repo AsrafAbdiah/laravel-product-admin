@@ -65,17 +65,158 @@ Alpine.data('confirmDialog', () => ({
  * choice the OS setting is used. An inline script in <head> applies it
  * before the page paints, so there is no flash of the wrong theme.
  */
+function setTheme(dark) {
+    document.documentElement.classList.toggle('dark', dark);
+    try {
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+    } catch (error) {
+        // Storage can be unavailable (private mode); the change still applies to this page.
+    }
+    // Keep every toggle on the page in step (e.g. after switching from the command palette).
+    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { dark } }));
+}
+
 Alpine.data('themeToggle', () => ({
     dark: document.documentElement.classList.contains('dark'),
 
+    init() {
+        window.addEventListener('theme-changed', (event) => (this.dark = event.detail.dark));
+    },
+
     toggle() {
-        this.dark = !this.dark;
-        document.documentElement.classList.toggle('dark', this.dark);
-        try {
-            localStorage.setItem('theme', this.dark ? 'dark' : 'light');
-        } catch (error) {
-            // Storage can be unavailable (private mode); the toggle still works for this page.
+        setTheme(!this.dark);
+    },
+}));
+
+/**
+ * The Ctrl+K (Cmd+K on a Mac) command palette. Pages and actions come from
+ * the server (App\Support\CommandPalette, already filtered by role) and are
+ * filtered here as you type; products and categories are fetched from
+ * /search, which only ever returns the current shop's records.
+ */
+Alpine.data('commandPalette', (commands = [], searchUrl = '') => ({
+    open: false,
+    query: '',
+    products: [],
+    categories: [],
+    loading: false,
+    active: 0,
+    timer: null,
+    controller: null,
+    returnFocusTo: null,
+
+    init() {
+        this.$watch('query', () => {
+            this.active = 0;
+            this.scheduleSearch();
+        });
+    },
+
+    // Everything currently listed, in display order, so the arrow keys can move through it.
+    get results() {
+        const words = this.query.toLowerCase().split(/\s+/).filter(Boolean);
+        const pages = commands
+            .filter((command) => {
+                const text = `${command.label} ${command.keywords}`.toLowerCase();
+                return words.every((word) => text.includes(word));
+            })
+            .map((command) => ({ group: 'Pages', label: command.label, hint: '', url: command.url, action: command.action }));
+
+        const products = this.products.map((product) => ({
+            group: 'Products',
+            label: product.name,
+            hint: [product.category, `${product.stock} in stock`].filter(Boolean).join(' · '),
+            url: product.url,
+        }));
+
+        const categories = this.categories.map((category) => ({
+            group: 'Categories',
+            label: category.name,
+            hint: `${category.products_count} ${category.products_count === 1 ? 'product' : 'products'}`,
+            url: category.url,
+        }));
+
+        return [...pages, ...products, ...categories];
+    },
+
+    show() {
+        if (this.open) return;
+        this.returnFocusTo = document.activeElement;
+        // Start fresh each time (cleared here, not on close, so the list doesn't change while it fades out).
+        this.query = '';
+        this.open = true;
+        document.body.classList.add('overflow-hidden');
+        this.$nextTick(() => this.$refs.input.focus());
+    },
+
+    close() {
+        if (!this.open) return;
+        this.open = false;
+        document.body.classList.remove('overflow-hidden');
+        this.returnFocusTo?.focus?.();
+    },
+
+    toggle() {
+        this.open ? this.close() : this.show();
+    },
+
+    // Wait until typing pauses for 200 ms, then ask the server.
+    scheduleSearch() {
+        clearTimeout(this.timer);
+        this.controller?.abort();
+
+        if (this.query.trim() === '') {
+            this.products = [];
+            this.categories = [];
+            this.loading = false;
+            return;
         }
+
+        this.loading = true;
+        this.timer = setTimeout(() => this.search(this.query.trim()), 200);
+    },
+
+    async search(term) {
+        // Cancel the previous request, so a slow old answer can't replace a newer one.
+        this.controller = new AbortController();
+
+        try {
+            const response = await fetch(`${searchUrl}?q=${encodeURIComponent(term)}`, {
+                headers: { Accept: 'application/json' },
+                signal: this.controller.signal,
+            });
+            if (!response.ok) throw new Error(`Search failed (${response.status})`);
+
+            const data = await response.json();
+            this.products = data.products;
+            this.categories = data.categories;
+        } catch (error) {
+            if (error.name === 'AbortError') return;
+            this.products = [];
+            this.categories = [];
+        }
+
+        this.loading = false;
+    },
+
+    move(step) {
+        const count = this.results.length;
+        if (count === 0) return;
+        this.active = (this.active + step + count) % count;
+        this.$nextTick(() => document.getElementById(`palette-item-${this.active}`)?.scrollIntoView({ block: 'nearest' }));
+    },
+
+    choose(item = this.results[this.active]) {
+        if (!item) return;
+
+        if (item.action === 'theme') {
+            setTheme(!document.documentElement.classList.contains('dark'));
+            this.close();
+            return;
+        }
+
+        this.close();
+        window.location.href = item.url;
     },
 }));
 

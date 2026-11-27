@@ -9,6 +9,7 @@ use App\Http\Controllers\Web\MarketingController;
 use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\OnboardingController;
 use App\Http\Controllers\Web\ProductController;
+use App\Http\Controllers\Web\SearchController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\TeamController;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +59,7 @@ Route::middleware(['auth', 'verified', 'team'])->group(function () {
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::post('/onboarding/dismiss', [OnboardingController::class, 'dismiss'])->name('onboarding.dismiss');
+    Route::get('/search', SearchController::class)->middleware('throttle:60,1')->name('search');
 
     // Declared before the resource routes so "bulk", "export" and "trash" are not mistaken for a product id.
     Route::delete('/products/bulk', [ProductController::class, 'bulkDestroy'])->name('products.bulk-destroy');
