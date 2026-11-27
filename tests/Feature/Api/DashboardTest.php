@@ -96,12 +96,6 @@ class DashboardTest extends TestCase
     }
 
     #[Test]
-    public function home_redirects_to_the_dashboard(): void
-    {
-        $this->actingAs($this->admin)->get('/')->assertRedirect('/dashboard');
-    }
-
-    #[Test]
     public function guests_and_non_admins_cannot_see_the_dashboard(): void
     {
         $this->get('/dashboard')->assertRedirect('/login');

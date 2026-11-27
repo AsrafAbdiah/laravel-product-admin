@@ -33,6 +33,10 @@
         'monitor' => '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
         'mail' =>'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
         'switch' => '<path d="M7 7h11l-3-3M17 17H6l3 3"/>',
+        'arrow-right' => '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
+        'bolt' => '<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>',
+        'lock' => '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>',
+        'command' => '<path d="M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3z"/>',
     ];
 @endphp
 

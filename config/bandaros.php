@@ -21,24 +21,34 @@ return [
     |--------------------------------------------------------------------------
     |
     | What each plan allows. null means unlimited. There are no payments yet:
-    | the shop owner switches plans on the Team page.
+    | the shop owner switches plans on the Team page. The public pricing page
+    | is built from this list too, so it always shows the real limits.
     |
     */
 
     'plans' => [
         'free' => [
             'name' => 'Free',
+            'price' => 'RM 0',
+            'period' => 'forever',
+            'tagline' => 'For a new shop getting organised.',
             'max_products' => 100,
             'max_members' => 2,
             'import' => false,
         ],
         'pro' => [
             'name' => 'Pro',
+            'price' => 'RM 49',
+            'period' => 'per month',
+            'tagline' => 'For a growing shop with a team.',
             'max_products' => null,
             'max_members' => null,
             'import' => true,
         ],
     ],
+
+    // Linked from the public website's footer.
+    'repository_url' => 'https://github.com/AsrafAbdiah/laravel-product-admin',
 
     /*
     |--------------------------------------------------------------------------

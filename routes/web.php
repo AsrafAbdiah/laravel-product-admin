@@ -5,6 +5,7 @@ use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\ExportController;
 use App\Http\Controllers\Web\InvitationController;
+use App\Http\Controllers\Web\MarketingController;
 use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\SettingsController;
@@ -14,7 +15,13 @@ use Illuminate\Support\Facades\Route;
 // Login, logout, sign-up, password reset, email verification and two-factor
 // routes come from Laravel Fortify (see config/fortify.php).
 
-Route::redirect('/', '/dashboard');
+// The public website, for visitors and signed-in users alike.
+Route::controller(MarketingController::class)->group(function () {
+    Route::get('/', 'home')->name('home');
+    Route::get('/pricing', 'pricing')->name('pricing');
+    Route::get('/terms', 'terms')->name('terms');
+    Route::get('/privacy', 'privacy')->name('privacy');
+});
 
 // Signed-in, verified members of a team. What each person may do on these
 // pages is decided by policies, from their role in the current team.

@@ -12,7 +12,7 @@ use InvalidArgumentException;
 class PlanLimits
 {
     /**
-     * @return array<string, array{name: string, max_products: ?int, max_members: ?int, import: bool}>
+     * @return array<string, array{name: string, price: string, period: string, tagline: string, max_products: ?int, max_members: ?int, import: bool}>
      */
     public function plans(): array
     {
@@ -20,7 +20,7 @@ class PlanLimits
     }
 
     /**
-     * @return array{name: string, max_products: ?int, max_members: ?int, import: bool}
+     * @return array{name: string, price: string, period: string, tagline: string, max_products: ?int, max_members: ?int, import: bool}
      */
     public function plan(Team $team): array
     {
