@@ -119,7 +119,7 @@
 
         {{-- Invitations --}}
         @if ($canManage)
-            <x-ui.card title="Invite someone">
+            <x-ui.card title="Invite someone" id="invite" class="scroll-mt-20">
                 <form method="POST" action="{{ route('team.invitations.store') }}" class="grid gap-3 sm:grid-cols-[1fr_10rem_auto] sm:items-end">
                     @csrf
                     <x-ui.field label="Email" for="invite-email" name="email">

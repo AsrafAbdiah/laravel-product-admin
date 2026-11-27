@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\ExportController;
 use App\Http\Controllers\Web\InvitationController;
 use App\Http\Controllers\Web\MarketingController;
 use App\Http\Controllers\Web\NotificationController;
+use App\Http\Controllers\Web\OnboardingController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\TeamController;
@@ -56,6 +57,7 @@ Route::middleware(['auth', 'verified', 'team'])->group(function () {
     Route::post('/invitations/{token}', [InvitationController::class, 'accept'])->name('invitations.accept');
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::post('/onboarding/dismiss', [OnboardingController::class, 'dismiss'])->name('onboarding.dismiss');
 
     // Declared before the resource routes so "bulk", "export" and "trash" are not mistaken for a product id.
     Route::delete('/products/bulk', [ProductController::class, 'bulkDestroy'])->name('products.bulk-destroy');

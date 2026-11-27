@@ -33,6 +33,16 @@ class Team extends Model
     ];
 
     /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'onboarding_dismissed_at' => 'datetime',
+        ];
+    }
+
+    /**
      * Audit log: renaming the shop or changing its plan.
      */
     public function getActivitylogOptions(): LogOptions

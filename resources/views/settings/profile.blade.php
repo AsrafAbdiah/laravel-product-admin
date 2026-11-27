@@ -76,7 +76,7 @@
         </x-ui.card>
 
         {{-- Two-factor authentication --}}
-        <x-ui.card title="Two-factor authentication">
+        <x-ui.card title="Two-factor authentication" id="two-factor" class="scroll-mt-20">
             <x-slot:actions>
                 @if ($user->hasEnabledTwoFactorAuthentication())
                     <x-ui.badge tone="success">On</x-ui.badge>

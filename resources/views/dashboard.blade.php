@@ -7,6 +7,55 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    {{-- Setup checklist for new shops (see App\Services\OnboardingChecklist) --}}
+    @if ($onboarding)
+        <x-ui.card class="mb-6" aria-labelledby="onboarding-title">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <h2 id="onboarding-title" class="font-semibold">Get your shop set up</h2>
+                    <p class="mt-0.5 text-sm text-ink-muted">{{ $onboarding['done'] }} of {{ $onboarding['total'] }} done. Steps tick off by themselves as you go.</p>
+                </div>
+                <form method="POST" action="{{ route('onboarding.dismiss') }}">
+                    @csrf
+                    <x-ui.button type="submit" variant="ghost" size="sm">Hide checklist</x-ui.button>
+                </form>
+            </div>
+
+            <div class="mt-4 h-2 rounded-full bg-surface-muted" role="progressbar" aria-label="Setup progress"
+                 aria-valuemin="0" aria-valuemax="{{ $onboarding['total'] }}" aria-valuenow="{{ $onboarding['done'] }}">
+                <div class="h-2 rounded-full bg-brand transition-[width]" style="width: {{ round($onboarding['done'] / $onboarding['total'] * 100) }}%"></div>
+            </div>
+
+            <ol class="mt-5 divide-y divide-line">
+                @foreach ($onboarding['steps'] as $step)
+                    <li class="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                        @if ($step['done'])
+                            <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand text-on-brand">
+                                <x-ui.icon name="check" class="h-4 w-4" />
+                            </span>
+                        @else
+                            <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-line-strong text-xs font-medium text-ink-subtle tabular-nums">{{ $loop->iteration }}</span>
+                        @endif
+
+                        <div class="min-w-0 flex-1">
+                            <p @class(['text-sm font-medium', 'text-ink-subtle line-through' => $step['done']])>
+                                {{ $step['title'] }}
+                                @if ($step['done']) <span class="sr-only">(done)</span> @endif
+                            </p>
+                            @unless ($step['done'])
+                                <p class="text-sm text-ink-muted">{{ $step['description'] }}</p>
+                            @endunless
+                        </div>
+
+                        @unless ($step['done'])
+                            <x-ui.button :href="$step['url']" variant="secondary" size="sm">{{ $step['action'] }}</x-ui.button>
+                        @endunless
+                    </li>
+                @endforeach
+            </ol>
+        </x-ui.card>
+    @endif
+
     {{-- Headline numbers --}}
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <x-ui.stat label="Products" :value="number_format($totals['products'])" :href="route('products.index')"
