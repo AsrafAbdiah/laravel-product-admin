@@ -1,6 +1,6 @@
 /**
- * Home page hero: entrance choreography, magnetic CTA, the drag-to-spin shop
- * model (resources/js/spinner.js) and the cards floating around it.
+ * Home page hero: entrance choreography, magnetic CTA, and gentle pointer
+ * parallax on the shop model and the cards floating around it.
  *
  * Rules this file follows:
  * - Only transform, opacity and clip-path are animated (compositor-only).
@@ -11,9 +11,6 @@
  * - Everything is reverted cleanly through gsap.context().
  */
 import { gsap } from 'gsap';
-import { createSpinner } from './spinner';
-
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 let context = null;
 
@@ -22,7 +19,6 @@ function init() {
     if (!hero) return;
 
     context = gsap.context(() => {
-        const spinner = setUpSpinner(hero);
         const mm = gsap.matchMedia();
 
         mm.add(
@@ -32,27 +28,18 @@ function init() {
             },
             ({ conditions }) => {
                 if (conditions.motion) {
-                    // Start the idle turn once the entrance has settled.
-                    playEntrance(hero).eventCallback('onComplete', () => spinner?.startAutoplay());
+                    playEntrance(hero);
                 } else {
-                    // Reduced motion: show everything straight away, and never spin on its own.
+                    // Reduced motion: show everything straight away.
                     gsap.set(hero.querySelectorAll('[data-reveal]'), { autoAlpha: 1 });
                 }
 
-                const stopPointer = conditions.motion && conditions.finePointer ? attachPointerEffects(hero) : () => {};
-
                 // Runs when a media query stops matching (or on revert).
-                return () => {
-                    spinner?.stopAutoplay();
-                    stopPointer();
-                };
+                return conditions.motion && conditions.finePointer ? attachPointerEffects(hero) : undefined;
             },
         );
 
-        return () => {
-            spinner?.destroy();
-            mm.revert();
-        };
+        return () => mm.revert();
     }, hero);
 }
 
@@ -83,31 +70,6 @@ function playEntrance(hero) {
         .fromTo(cards, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.1 }, 0.75)
         // The wipe is done; drop the clip-path so nothing near the edge is ever clipped.
         .set(visual, { clearProps: 'clipPath' });
-}
-
-/**
- * The shop model, plus the angle readout and tick marks under it. As the shop
- * turns, the floating cards drift a few pixels, as if they hang in front of it.
- */
-function setUpSpinner(hero) {
-    const root = hero.querySelector('[data-spinner]');
-    if (!root) return null;
-
-    const angleLabel = hero.querySelector('[data-spin-angle]');
-    const ticks = [...hero.querySelectorAll('[data-spin-tick]')];
-    const drifters = [...hero.querySelectorAll('[data-drift]')].map((el) => ({ el, amount: Number(el.dataset.drift) || 0 }));
-
-    return createSpinner(root, {
-        reducedMotion,
-        onChange({ position, angle, frame }) {
-            if (angleLabel) angleLabel.textContent = `${String(angle).padStart(3, '0')}°`;
-            ticks.forEach((tick, i) => tick.toggleAttribute('data-active', i === frame));
-
-            // CSS "translate" composes with the GSAP transforms on the same elements.
-            const radians = (position / ticks.length) * Math.PI * 2;
-            drifters.forEach(({ el, amount }) => (el.style.translate = `${(Math.sin(radians) * amount).toFixed(2)}px 0`));
-        },
-    });
 }
 
 /**

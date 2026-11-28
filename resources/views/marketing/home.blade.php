@@ -39,11 +39,10 @@
     @endpush
 
     {{--
-        Hero: a centred stage. Headline above, the drag-to-spin shop model in
-        the middle with cards floating around it, buttons below. Motion lives in
-        resources/js/hero.js and spinner.js; elements marked data-reveal start
-        hidden only when JavaScript runs (resources/css/hero.css), so the page
-        is complete without it.
+        Hero: a centred stage. Headline above, the shop model in the middle with
+        cards floating around it, buttons below. Motion lives in
+        resources/js/hero.js; elements marked data-reveal start hidden only when
+        JavaScript runs (resources/css/hero.css), so the page is complete without it.
     --}}
     <section data-hero class="relative overflow-hidden border-b border-line">
         <div class="mx-auto flex max-w-7xl flex-col px-4 pt-14 pb-16 sm:px-6 sm:pt-20 lg:px-10">
@@ -66,45 +65,26 @@
                 </p>
             </div>
 
-            {{-- Stage: the model, its readout, and the cards (floating beside it on large screens) --}}
+            {{-- Stage: the shop model, with the cards floating beside it on large screens --}}
             <div data-hero-stage class="relative order-3 mx-auto mt-10 w-full max-w-6xl lg:order-2 lg:mt-6">
                 <div data-hero-visual data-reveal class="relative mx-auto w-full max-w-[680px]">
                     <div data-depth="0.15" class="relative">
-                        {{-- A hairline "ground" at the level the shop stands on (frames have a 24px base margin of 536) --}}
-                        <div class="hero-ground pointer-events-none absolute -inset-x-[40%] bottom-[4.5%] h-px bg-line-strong" aria-hidden="true"></div>
+                        {{-- A hairline "ground" at the level the shop stands on (the image has a 5.7% base margin) --}}
+                        <div class="hero-ground pointer-events-none absolute -inset-x-[40%] bottom-[5.7%] h-px bg-line-strong" aria-hidden="true"></div>
 
-                        <div data-spinner role="img" aria-label="A 3D model of a convenience store"
-                             data-src="{{ asset('images/mini-mart-spin.webp') }}" data-frames="5" data-columns="4" data-rows="2"
-                             class="hero-spinner relative aspect-[692/536] w-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-4 focus-visible:ring-offset-canvas">
-                            <img data-spinner-poster src="{{ asset('images/mini-mart.webp') }}" width="692" height="536" alt="" draggable="false"
-                                 fetchpriority="high" decoding="async" class="absolute inset-0 h-full w-full object-contain">
-                            <canvas data-spinner-canvas class="absolute inset-0 h-full w-full" aria-hidden="true"></canvas>
-                        </div>
-                    </div>
-
-                    {{-- Drag hint, current angle and one tick per view --}}
-                    <div class="mt-3 flex items-center justify-center gap-4 font-mono text-[11px] tracking-wide text-ink-muted uppercase" aria-hidden="true">
-                        <span data-spin-hint class="hero-spin-hint flex items-center gap-2">
-                            <svg viewBox="0 0 32 24" class="h-4 w-6 text-accent" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 6h7M3 6l2.5-2.5M3 6l2.5 2.5M29 6h-7M29 6l-2.5-2.5M29 6l2.5 2.5" />
-                                <path d="M13.5 16V8.5a1.5 1.5 0 0 1 3 0V14m0-1.5a1.5 1.5 0 0 1 3 0V15m0-1a1.5 1.5 0 0 1 3 0v3.5a5 5 0 0 1-5 5h-1.2a5 5 0 0 1-4.1-2.1L9.4 17a1.4 1.4 0 0 1 2.2-1.7l1.9 2" />
-                            </svg>
-                            Drag to rotate 360°
-                        </span>
-                        <span class="h-3 w-px bg-line-strong"></span>
-                        <span data-spin-angle class="w-9 text-ink tabular-nums">000°</span>
-                        <span class="flex gap-1">
-                            @for ($i = 0; $i < 5; $i++)
-                                <span data-spin-tick @if ($i === 0) data-active @endif class="hero-spin-tick"></span>
-                            @endfor
-                        </span>
+                        <img src="{{ asset('images/mini-mart.webp') }}"
+                             srcset="{{ asset('images/mini-mart-800.webp') }} 800w, {{ asset('images/mini-mart.webp') }} 1400w"
+                             sizes="(min-width: 768px) 680px, 92vw" width="1400" height="979"
+                             fetchpriority="high" decoding="async" draggable="false"
+                             class="relative block h-auto w-full select-none"
+                             alt="A cut-away model of a convenience store with stocked shelves, drinks fridges and a checkout counter">
                     </div>
                 </div>
 
                 {{-- Cards: a grid under the model on small screens, floating around it on large ones --}}
                 <div class="mt-8 grid gap-3 sm:grid-cols-3 lg:mt-0 lg:block">
                     <div data-depth="0.9" class="lg:absolute lg:top-[12%] lg:left-0 lg:w-64">
-                        <div data-reveal="card" data-drift="10">
+                        <div data-reveal="card">
                             <div class="hero-card">
                                 <p class="hero-card-label"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span> Low stock · 09:14</p>
                                 <p class="mt-2 text-sm font-semibold">Kopi Robusta 1kg</p>
@@ -118,7 +98,7 @@
                     </div>
 
                     <div data-depth="1.3" class="lg:absolute lg:top-[4%] lg:right-0 lg:w-60">
-                        <div data-reveal="card" data-drift="-14">
+                        <div data-reveal="card">
                             <div class="hero-card">
                                 <p class="hero-card-label">Team · Kedai Siti</p>
                                 <ul class="mt-3 space-y-2 text-sm">
@@ -131,7 +111,7 @@
                     </div>
 
                     <div data-depth="0.7" class="lg:absolute lg:right-[3%] lg:bottom-[20%] lg:w-72">
-                        <div data-reveal="card" data-drift="8">
+                        <div data-reveal="card">
                             <div class="hero-card">
                                 <p class="hero-card-label"><span class="h-1.5 w-1.5 rounded-full bg-sage"></span> Audit log</p>
                                 <ol class="mt-3 space-y-2.5 text-sm">

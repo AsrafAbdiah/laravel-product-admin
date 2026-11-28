@@ -33,7 +33,7 @@ Each shop (team) gets its own products, categories, stock history and members, f
 - **Automation:** low-stock alerts (in-app and email), background imports and exports, weekly stock summary email, scheduled clean-up
 - **Plans:** Free (100 products, 2 members, no import) and Pro (unlimited); payments not connected yet
 - **REST API** with Sanctum tokens (read-only or read-write), documented with Swagger at `/api/documentation`
-- **UI:** warm editorial design system (Instrument Serif, Plus Jakarta Sans, JetBrains Mono; terracotta brand from the logo), a hero with a drag-to-spin 360° shop model (canvas sprite, no library) and GSAP entrance motion, sidebar app shell, Ctrl+K command palette, dark mode, toasts, confirm dialogs, mobile layouts (Blade, Tailwind 4, Alpine.js)
+- **UI:** warm editorial design system (Instrument Serif, Plus Jakarta Sans, JetBrains Mono; terracotta brand from the logo), an editorial hero with GSAP entrance motion, sidebar app shell, Ctrl+K command palette, dark mode, toasts, confirm dialogs, mobile layouts (Blade, Tailwind 4, Alpine.js)
 - **Onboarding:** a public website (landing page, pricing built from the real plan limits, terms, privacy) and a "Get your shop set up" checklist for new shops
 
 ## Getting started

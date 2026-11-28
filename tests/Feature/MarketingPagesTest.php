@@ -115,16 +115,14 @@ class MarketingPagesTest extends TestCase
     }
 
     #[Test]
-    public function the_hero_ships_the_spin_sprite_and_a_poster_that_works_without_javascript(): void
+    public function the_hero_shows_the_shop_model_with_a_phone_sized_version(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('data-src="'.asset('images/mini-mart-spin.webp').'" data-frames="5" data-columns="4" data-rows="2"', false)
-            ->assertSee('src="'.asset('images/mini-mart.webp').'"', false)
-            // It only becomes a slider once the script has loaded the sheet.
-            ->assertSee('role="img" aria-label="A 3D model of a convenience store"', false);
+            ->assertSee('srcset="'.asset('images/mini-mart-800.webp').' 800w, '.asset('images/mini-mart.webp').' 1400w"', false)
+            ->assertSee('alt="A cut-away model of a convenience store', false);
 
-        $this->assertFileExists(public_path('images/mini-mart-spin.webp'));
         $this->assertFileExists(public_path('images/mini-mart.webp'));
+        $this->assertFileExists(public_path('images/mini-mart-800.webp'));
     }
 }
