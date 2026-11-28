@@ -18,20 +18,22 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:image" content="{{ asset('images/dashboard.jpg') }}">
     <meta name="twitter:card" content="summary_large_image">
+
+    {{-- Page-specific scripts, e.g. the home page hero animation. --}}
+    @stack('scripts')
 </head>
 <body class="min-h-screen bg-canvas font-sans text-ink antialiased">
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2">Skip to content</a>
 
-    <header class="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur">
-        <div class="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:gap-6 sm:px-6">
-            <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-2.5" aria-label="BandarOS home">
-                <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand font-bold text-on-brand">B</span>
-                <span class="hidden text-lg font-semibold tracking-tight min-[400px]:inline">Bandar<span class="text-brand">OS</span></span>
+    <header class="sticky top-0 z-30 border-b border-line bg-canvas/90 backdrop-blur-sm">
+        <div class="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:gap-8 sm:px-6 lg:px-10">
+            <a href="{{ route('home') }}" class="shrink-0" aria-label="BandarOS home">
+                <x-logo class="h-7" />
             </a>
 
-            <nav class="flex items-center gap-1 text-sm font-medium text-ink-muted" aria-label="Website">
-                <a href="{{ route('home') }}#features" class="hidden rounded-lg px-3 py-2 hover:text-ink sm:block">Features</a>
-                <a href="{{ route('pricing') }}" @class(['rounded-lg px-2 py-2 hover:text-ink sm:px-3', 'text-ink' => request()->routeIs('pricing')])>Pricing</a>
+            <nav class="flex items-center gap-1 font-mono text-xs tracking-wide text-ink-muted uppercase" aria-label="Website">
+                <a href="{{ route('home') }}#features" class="hidden px-2 py-2 hover:text-ink md:block">Features</a>
+                <a href="{{ route('pricing') }}" @class(['hidden px-2 py-2 hover:text-ink min-[480px]:block', 'text-ink' => request()->routeIs('pricing')])>Pricing</a>
             </nav>
 
             <div class="ml-auto flex items-center gap-1 sm:gap-2">
@@ -58,13 +60,12 @@
     </main>
 
     <footer class="border-t border-line">
-        <div class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-10">
             <div>
-                <a href="{{ route('home') }}" class="flex items-center gap-2">
-                    <span class="grid h-7 w-7 place-items-center rounded-md bg-brand text-sm font-bold text-on-brand">B</span>
-                    <span class="font-semibold tracking-tight">Bandar<span class="text-brand">OS</span></span>
+                <a href="{{ route('home') }}" aria-label="BandarOS home">
+                    <x-logo class="h-6" />
                 </a>
-                <p class="mt-2 text-sm text-ink-subtle">Inventory for small shops.</p>
+                <p class="mt-3 font-mono text-xs tracking-wide text-ink-subtle uppercase">Inventory for small shops</p>
             </div>
 
             <nav class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-muted" aria-label="Footer">
@@ -75,7 +76,7 @@
                 <a href="{{ config('bandaros.repository_url') }}" class="hover:text-ink" rel="noopener">Source code</a>
             </nav>
         </div>
-        <p class="mx-auto max-w-6xl px-4 pb-8 text-xs text-ink-subtle sm:px-6">© {{ date('Y') }} {{ config('app.name') }}</p>
+        <p class="mx-auto max-w-7xl px-4 pb-8 font-mono text-xs text-ink-subtle sm:px-6 lg:px-10">© {{ date('Y') }} {{ config('app.name') }}</p>
     </footer>
 
     @include('partials.overlays')

@@ -34,50 +34,161 @@
 @endphp
 
 <x-marketing-layout>
-    {{-- Hero --}}
-    <section class="relative overflow-hidden">
-        <div class="pointer-events-none absolute inset-x-0 -top-40 -z-10 mx-auto h-[28rem] max-w-4xl rounded-full bg-brand-soft opacity-70 blur-3xl"></div>
+    @push('scripts')
+        @vite('resources/js/hero.js')
+    @endpush
 
-        <div class="mx-auto max-w-6xl px-4 pt-16 pb-12 text-center sm:px-6 sm:pt-24">
-            <p class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-muted">
-                <span class="h-1.5 w-1.5 rounded-full bg-brand"></span>
-                Inventory software for small shops
-            </p>
+    {{--
+        Hero: an asymmetric editorial grid. Text on the left, an interactive
+        preview of the product on the right. Motion lives in resources/js/hero.js;
+        elements marked data-reveal start hidden only when JavaScript runs
+        (resources/css/hero.css), so the page is complete without it.
+    --}}
+    <section data-hero class="relative overflow-hidden border-b border-line">
+        <div class="mx-auto grid max-w-7xl grid-cols-12 px-4 sm:px-6 lg:px-10">
+            {{-- Left: message and calls to action (columns 1-6) --}}
+            <div class="col-span-12 flex flex-col justify-center py-14 sm:py-20 lg:col-span-6 lg:border-r lg:border-line lg:py-24 lg:pr-12">
+                <p data-reveal="fade" class="flex items-center gap-3 font-mono text-xs tracking-[0.14em] text-ink-muted uppercase">
+                    <span class="text-accent">01</span>
+                    <span class="h-px w-8 bg-line-strong" aria-hidden="true"></span>
+                    Inventory for small shops
+                </p>
 
-            <h1 class="mx-auto mt-6 max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
-                Know what’s on your shelves, <span class="text-brand">all the time.</span>
-            </h1>
+                <h1 data-reveal class="font-display-tight mt-8 text-[clamp(2.75rem,5.4vw,5rem)] text-ink">
+                    <span class="block overflow-hidden pb-[0.06em]"><span data-hero-line class="block">Every shelf counted.</span></span>
+                    <span class="block overflow-hidden pb-[0.06em]"><span data-hero-line class="block text-ink-muted italic">Every change signed.</span></span>
+                </h1>
 
-            <p class="mx-auto mt-6 max-w-2xl text-lg text-pretty text-ink-muted">
-                BandarOS keeps your products, stock and team in one place. See what’s running low,
-                who changed what, and give every staff member just the access they need.
-            </p>
+                <p data-reveal="fade" class="mt-8 max-w-md text-lg leading-relaxed text-ink-muted">
+                    Stock, staff and an audit trail for shops run by a small team.
+                    Know what’s running low before the shelf is empty.
+                </p>
 
-            <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                @auth
-                    <x-ui.button :href="route('dashboard')" class="px-5 py-2.5 text-base">Go to dashboard</x-ui.button>
-                @else
-                    <x-ui.button :href="route('register')" class="px-5 py-2.5 text-base">
-                        Start free <x-ui.icon name="arrow-right" class="h-4 w-4" />
-                    </x-ui.button>
-                @endauth
-                <x-ui.button :href="route('pricing')" variant="secondary" class="px-5 py-2.5 text-base">See pricing</x-ui.button>
-            </div>
-            <p class="mt-4 text-sm text-ink-subtle">Free plan, no card needed.</p>
-        </div>
-
-        {{-- Product screenshot in a browser frame --}}
-        <div class="mx-auto max-w-5xl px-4 pb-20 sm:px-6">
-            <div class="overflow-hidden rounded-xl border border-line-strong bg-surface shadow-2xl shadow-brand/10">
-                <div class="flex items-center gap-1.5 border-b border-line bg-surface-muted px-4 py-2.5" aria-hidden="true">
-                    <span class="h-2.5 w-2.5 rounded-full bg-line-strong"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-line-strong"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-line-strong"></span>
+                <div data-reveal="fade" class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+                    {{-- The zone is a little larger than the button, so the pull starts just before the pointer reaches it. --}}
+                    <span data-magnetic-zone class="-m-4 inline-block p-4">
+                        <a data-magnetic href="{{ auth()->check() ? route('dashboard') : route('register') }}"
+                           class="inline-flex items-center gap-3 rounded-full bg-brand px-7 py-4 text-[15px] font-semibold text-on-brand transition-colors hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand">
+                            <span data-magnetic-label class="inline-flex items-center gap-3">
+                                {{ auth()->check() ? 'Go to dashboard' : 'Start free' }}
+                                <x-ui.icon name="arrow-right" class="h-4 w-4" />
+                            </span>
+                        </a>
+                    </span>
+                    <a href="{{ route('pricing') }}" class="group inline-flex items-center gap-2 text-[15px] font-medium text-ink">
+                        <span class="border-b border-line-strong pb-0.5 transition-colors group-hover:border-ink">See pricing</span>
+                    </a>
                 </div>
-                <img src="{{ asset('images/dashboard.jpg') }}" width="800" height="506" class="block w-full dark:hidden"
-                     alt="The BandarOS dashboard: product totals, low-stock items, products per category and recent stock changes">
-                <img src="{{ asset('images/dashboard-dark.jpg') }}" width="800" height="506" class="hidden w-full dark:block"
-                     alt="The BandarOS dashboard in dark mode">
+
+                <dl data-reveal="fade" class="mt-14 grid max-w-lg grid-cols-3 border-t border-line pt-5 font-mono text-[11px] tracking-wide uppercase">
+                    <div>
+                        <dt class="text-ink-subtle">Free plan</dt>
+                        <dd class="mt-1 text-ink">{{ $plans['free']['max_products'] }} products</dd>
+                    </div>
+                    <div class="border-l border-line pl-4">
+                        <dt class="text-ink-subtle">Card</dt>
+                        <dd class="mt-1 text-ink">Not needed</dd>
+                    </div>
+                    <div class="border-l border-line pl-4">
+                        <dt class="text-ink-subtle">Your data</dt>
+                        <dd class="mt-1 text-ink">Kept per shop</dd>
+                    </div>
+                </dl>
+            </div>
+
+            {{-- Right: interactive preview (columns 7-12) --}}
+            <div class="col-span-12 pb-14 lg:col-span-6 lg:py-16 lg:pl-12">
+                <div data-hero-visual data-reveal class="relative">
+                    {{-- data-tilt rotates gently with the pointer; data-depth layers shift by different amounts. --}}
+                    <div data-tilt class="relative aspect-[1400/1226] overflow-hidden rounded-[20px] border border-line bg-sage-soft">
+                        <div data-depth="0.2" class="absolute inset-0">
+                            <picture>
+                                <source type="image/webp" srcset="{{ asset('images/hero-shop-700.webp') }} 700w, {{ asset('images/hero-shop.webp') }} 1400w"
+                                        sizes="(min-width: 1024px) 560px, 92vw">
+                                <img src="{{ asset('images/hero-shop.jpg') }}" srcset="{{ asset('images/hero-shop-700.jpg') }} 700w, {{ asset('images/hero-shop.jpg') }} 1400w"
+                                     sizes="(min-width: 1024px) 560px, 92vw" width="1400" height="1226" fetchpriority="high" decoding="async"
+                                     class="h-full w-full scale-[1.06] object-cover"
+                                     alt="Illustration of a two-storey corner shop with striped awnings">
+                            </picture>
+                        </div>
+
+                        {{-- Tab panels: editorial cards layered over the shop --}}
+                        <div id="hero-panel-stock" role="tabpanel" aria-labelledby="hero-tab-stock" data-panel class="absolute inset-0">
+                            <div data-depth="0.9" class="absolute bottom-[7%] left-[5%] w-[58%] max-w-72">
+                                <div data-card class="hero-card">
+                                    <p class="hero-card-label"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span> Low stock · 09:14</p>
+                                    <p class="mt-2 text-sm font-semibold">Kopi Robusta 1kg</p>
+                                    <div class="mt-2 flex items-baseline justify-between">
+                                        <p class="font-display-tight text-4xl">3 <span class="text-base text-ink-muted">left</span></p>
+                                        <p class="font-mono text-[10px] text-ink-subtle uppercase">Reorder at 5</p>
+                                    </div>
+                                    <div class="mt-3 h-1 rounded-full bg-surface-muted"><div class="h-1 w-[15%] rounded-full bg-accent"></div></div>
+                                </div>
+                            </div>
+                            <div data-depth="1.4" class="absolute top-[7%] right-[5%]">
+                                <div data-card class="hero-card px-3 py-2">
+                                    <p class="hero-card-label">Today</p>
+                                    <p class="mt-1 text-sm font-semibold">42 sold <span class="ml-1 rounded-full bg-sage-soft px-2 py-0.5 font-mono text-[10px] text-ink-muted">+12%</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="hero-panel-team" role="tabpanel" aria-labelledby="hero-tab-team" data-panel class="absolute inset-0" hidden>
+                            <div data-depth="0.9" class="absolute bottom-[7%] left-[5%] w-[60%] max-w-76">
+                                <div data-card class="hero-card">
+                                    <p class="hero-card-label">Team · Kedai Siti</p>
+                                    <ul class="mt-3 space-y-2 text-sm">
+                                        <li class="flex items-center justify-between gap-3"><span class="font-medium">Siti</span><span class="hero-tag bg-brand-soft text-brand-ink">Owner</span></li>
+                                        <li class="flex items-center justify-between gap-3"><span class="font-medium">Amir</span><span class="hero-tag bg-sage-soft text-ink-muted">Staff</span></li>
+                                        <li class="flex items-center justify-between gap-3"><span class="font-medium">Mei</span><span class="hero-tag bg-surface-muted text-ink-muted">Viewer</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div data-depth="1.4" class="absolute top-[7%] right-[5%]">
+                                <div data-card class="hero-card px-3 py-2">
+                                    <p class="hero-card-label">Invitation sent</p>
+                                    <p class="mt-1 text-sm font-semibold">Expires in 7 days</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="hero-panel-audit" role="tabpanel" aria-labelledby="hero-tab-audit" data-panel class="absolute inset-0" hidden>
+                            <div data-depth="0.9" class="absolute bottom-[7%] left-[5%] w-[72%] max-w-84">
+                                <div data-card class="hero-card">
+                                    <p class="hero-card-label">Audit log</p>
+                                    <ol class="mt-3 space-y-2.5 text-sm">
+                                        <li class="grid grid-cols-[3rem_1fr] gap-2">
+                                            <span class="font-mono text-xs text-ink-subtle">09:42</span>
+                                            <span><span class="font-medium">Amir</span> changed price <span class="font-mono text-xs whitespace-nowrap">RM 18.00 → RM 20.00</span></span>
+                                        </li>
+                                        <li class="grid grid-cols-[3rem_1fr] gap-2">
+                                            <span class="font-mono text-xs text-ink-subtle">09:15</span>
+                                            <span><span class="font-medium">Siti</span> restocked Teh Tarik Mix <span class="font-mono text-xs">+24</span></span>
+                                        </li>
+                                    </ol>
+                                </div>
+                            </div>
+                            <div data-depth="1.4" class="absolute top-[7%] right-[5%]">
+                                <div data-card class="hero-card px-3 py-2">
+                                    <p class="hero-card-label"><span class="h-1.5 w-1.5 rounded-full bg-sage"></span> Signed</p>
+                                    <p class="mt-1 text-sm font-semibold">Every change, by name</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Tabs. Hidden without JavaScript, when only the first panel shows. --}}
+                    <div role="tablist" aria-label="Product preview" class="relative mt-4 hidden grid-cols-3 border-t border-line [.js_&]:grid">
+                        <span data-tab-indicator class="absolute -top-px left-0 h-0.5 w-1/3 bg-accent" aria-hidden="true"></span>
+                        @foreach (['stock' => 'Stock', 'team' => 'Team', 'audit' => 'Audit'] as $key => $label)
+                            <button type="button" role="tab" id="hero-tab-{{ $key }}" aria-controls="hero-panel-{{ $key }}"
+                                    aria-selected="{{ $loop->first ? 'true' : 'false' }}" tabindex="{{ $loop->first ? '0' : '-1' }}"
+                                    class="group py-3 text-left font-mono text-xs tracking-wide text-ink-subtle uppercase transition-colors hover:text-ink aria-selected:text-ink">
+                                <span class="mr-1.5 group-aria-selected:text-accent">0{{ $loop->iteration }}</span>{{ $label }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -86,7 +197,7 @@
     <section id="features" class="scroll-mt-16 border-t border-line bg-surface py-20">
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
             <div class="mx-auto max-w-2xl text-center">
-                <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">Everything a shop needs, nothing it doesn’t</h2>
+                <h2 class="font-display-tight text-4xl sm:text-5xl">Everything a shop needs, nothing it doesn’t</h2>
                 <p class="mt-4 text-ink-muted">The tools larger companies use to run their stock, sized for a shop with a few people.</p>
             </div>
 
@@ -107,7 +218,7 @@
     {{-- How it works --}}
     <section class="py-20">
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 class="text-center text-3xl font-semibold tracking-tight sm:text-4xl">Up and running in three steps</h2>
+            <h2 class="text-center font-display-tight text-4xl sm:text-5xl">Up and running in three steps</h2>
 
             <ol class="mt-14 grid gap-8 md:grid-cols-3">
                 @foreach ($steps as $i => [$name, $text])
@@ -130,7 +241,7 @@
                 <span class="grid h-12 w-12 place-items-center rounded-xl bg-brand-soft text-brand">
                     <x-ui.icon name="lock" class="h-6 w-6" />
                 </span>
-                <h2 class="mt-6 text-3xl font-semibold tracking-tight sm:text-4xl">Security you’d expect from a much bigger company</h2>
+                <h2 class="mt-6 font-display-tight text-4xl sm:text-5xl">Security you’d expect from a much bigger company</h2>
                 <p class="mt-4 text-ink-muted">Your stock list, prices and suppliers are business data. BandarOS protects them the same way enterprise software does, on every plan.</p>
             </div>
 
@@ -149,7 +260,7 @@
     <section class="py-20">
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
             <div class="mx-auto mb-14 max-w-2xl text-center">
-                <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">Simple pricing</h2>
+                <h2 class="font-display-tight text-4xl sm:text-5xl">Simple pricing</h2>
                 <p class="mt-4 text-ink-muted">Start free and upgrade when your shop grows. <a href="{{ route('pricing') }}" class="font-medium text-brand hover:underline">Compare plans</a></p>
             </div>
 
@@ -160,7 +271,7 @@
     {{-- FAQ --}}
     <section class="border-t border-line bg-surface py-20">
         <div class="mx-auto max-w-3xl px-4 sm:px-6">
-            <h2 class="text-center text-3xl font-semibold tracking-tight sm:text-4xl">Questions and answers</h2>
+            <h2 class="text-center font-display-tight text-4xl sm:text-5xl">Questions and answers</h2>
 
             <div class="mt-12 divide-y divide-line rounded-xl border border-line bg-canvas">
                 @foreach ($faqs as [$question, $answer])
@@ -180,7 +291,7 @@
     <section class="py-20">
         <div class="mx-auto max-w-4xl px-4 sm:px-6">
             <div class="rounded-2xl bg-brand px-6 py-14 text-center text-on-brand sm:px-12">
-                <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">Get your stock under control today</h2>
+                <h2 class="font-display-tight text-4xl sm:text-5xl">Get your stock under control today</h2>
                 <p class="mx-auto mt-4 max-w-xl opacity-90">Set up your shop in a minute. Free for up to {{ $plans['free']['max_products'] }} products.</p>
                 <div class="mt-8">
                     @auth

@@ -1,0 +1,56 @@
+/*
+ * Home page hero (resources/views/marketing/home.blade.php).
+ * Motion is in resources/js/hero.js; this file only holds the static styles.
+ */
+
+/*
+ * Start animated elements hidden, but only when JavaScript runs (the head
+ * script adds the "js" class), so the page is never blank without it.
+ * GSAP reveals them with autoAlpha. If the hero script fails to load, the
+ * fallback animation makes them visible after 3s anyway. A CSS animation
+ * overrides inline styles, but GSAP has finished by then, so nothing jumps.
+ */
+.js [data-reveal] {
+    visibility: hidden;
+    animation: hero-reveal-fallback 0s linear 3s forwards;
+}
+
+@keyframes hero-reveal-fallback {
+    to {
+        visibility: visible;
+    }
+}
+
+@layer components {
+    /* Small editorial cards layered over the shop illustration. */
+    .hero-card {
+        border: 1px solid var(--line);
+        border-radius: 0.875rem;
+        background: var(--surface);
+        padding: 0.875rem 1rem;
+        color: var(--ink);
+        box-shadow:
+            0 1px 0 rgb(22 22 20 / 0.04),
+            0 18px 36px -18px rgb(22 22 20 / 0.28);
+    }
+
+    .hero-card-label {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-subtle);
+    }
+
+    .hero-tag {
+        border-radius: 9999px;
+        padding: 0.125rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+}

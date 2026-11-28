@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Vite;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -18,7 +19,7 @@ class MarketingPagesTest extends TestCase
     public static function pages(): array
     {
         return [
-            'home' => ['/', 'Know what’s on your shelves'],
+            'home' => ['/', 'Every shelf counted.'],
             'pricing' => ['/pricing', 'Compare plans'],
             'terms' => ['/terms', 'Terms of Service'],
             'privacy' => ['/privacy', 'Privacy Policy'],
@@ -91,5 +92,25 @@ class MarketingPagesTest extends TestCase
             ->assertOk()
             ->assertSee('<meta name="description"', false)
             ->assertSee('<meta property="og:image" content="'.asset('images/dashboard.jpg').'">', false);
+    }
+
+    #[Test]
+    public function every_page_shows_the_logo_and_the_svg_favicon(): void
+    {
+        foreach (['/', '/pricing', '/login'] as $url) {
+            $this->get($url)
+                ->assertOk()
+                ->assertSee('<link rel="icon" href="'.asset('favicon.svg').'" type="image/svg+xml">', false)
+                ->assertSee('viewBox="0 0 240 315"', false);
+        }
+    }
+
+    #[Test]
+    public function only_the_home_page_loads_the_hero_animation(): void
+    {
+        $heroScript = Vite::asset('resources/js/hero.js');
+
+        $this->get('/')->assertOk()->assertSee($heroScript, false)->assertSee('role="tablist"', false);
+        $this->get('/pricing')->assertOk()->assertDontSee($heroScript, false);
     }
 }

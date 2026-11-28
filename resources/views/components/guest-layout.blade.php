@@ -9,8 +9,7 @@
 <body class="min-h-full bg-canvas font-sans text-ink antialiased">
     <main class="flex min-h-screen flex-col items-center justify-center px-4 py-12">
         <a href="{{ url('/') }}" class="mb-8 flex items-center gap-2.5">
-            <span class="grid h-10 w-10 place-items-center rounded-xl bg-brand text-lg font-bold text-on-brand">B</span>
-            <span class="text-2xl font-semibold tracking-tight">Bandar<span class="text-brand">OS</span></span>
+            <x-logo class="h-10" />
         </a>
 
         <div class="w-full max-w-sm">

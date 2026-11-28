@@ -41,8 +41,7 @@
            :class="sidebarOpen && 'translate-x-0'" aria-label="Main navigation">
         <div class="flex h-16 shrink-0 items-center justify-between px-5">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5">
-                <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand font-bold text-on-brand">B</span>
-                <span class="text-lg font-semibold tracking-tight">Bandar<span class="text-brand">OS</span></span>
+                <x-logo class="h-8" />
             </a>
             <button type="button" class="rounded-lg p-1.5 text-ink-muted hover:bg-surface-muted lg:hidden" @click="sidebarOpen = false" aria-label="Close menu">
                 <x-ui.icon name="x" />
@@ -153,7 +152,7 @@
             <button type="button" class="-ml-1 rounded-lg p-1.5 text-ink-muted hover:bg-surface-muted" @click="sidebarOpen = true" aria-label="Open menu">
                 <x-ui.icon name="menu" />
             </button>
-            <span class="font-semibold">Bandar<span class="text-brand">OS</span></span>
+            <x-logo class="h-6" />
             @if ($team)
                 <span class="ml-auto truncate text-sm text-ink-muted">{{ $team->name }}</span>
             @endif

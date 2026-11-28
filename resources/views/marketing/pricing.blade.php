@@ -1,7 +1,7 @@
 <x-marketing-layout title="Pricing" description="BandarOS pricing: a Free plan for new shops and a Pro plan with unlimited products, team members and file import.">
     <section class="mx-auto max-w-6xl px-4 pt-16 pb-20 sm:px-6 sm:pt-24">
         <div class="mx-auto mb-14 max-w-2xl text-center">
-            <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">Pricing that grows with your shop</h1>
+            <h1 class="font-display-tight text-5xl sm:text-6xl">Pricing that grows with your shop</h1>
             <p class="mt-4 text-lg text-ink-muted">Start on the Free plan. Upgrade when you need more products, more people or file import.</p>
         </div>
 
@@ -15,7 +15,7 @@
     {{-- Feature comparison, built from the same plan settings the app enforces --}}
     <section class="border-t border-line bg-surface py-20">
         <div class="mx-auto max-w-4xl px-4 sm:px-6">
-            <h2 class="text-center text-2xl font-semibold tracking-tight sm:text-3xl">Compare plans</h2>
+            <h2 class="text-center font-display-tight text-4xl">Compare plans</h2>
 
             <div class="mt-10 overflow-x-auto rounded-xl border border-line">
                 <table class="w-full text-sm">

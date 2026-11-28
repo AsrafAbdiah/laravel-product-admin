@@ -2,19 +2,25 @@
 
 @source '../../storage/framework/views/*.php';
 
+@import './hero.css';
+
 /* Dark mode follows a "dark" class on <html>, set by the theme toggle. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * BandarOS design tokens.
+ * BandarOS design tokens: a warm editorial palette built around the
+ * terracotta in the logo.
  *
  * Pages use semantic names (bg-surface, text-ink, border-line, ...) instead
  * of raw colours. The variables below switch between light and dark, so
- * components rarely need their own dark: classes.
+ * components rarely need their own dark: classes, and a rebrand is a change
+ * to this block only.
  */
 @theme inline {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Instrument Serif', ui-serif, Georgia, serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
     --color-canvas: var(--canvas);
     --color-surface: var(--surface);
@@ -30,6 +36,9 @@
     --color-brand-soft: var(--brand-soft);
     --color-brand-ink: var(--brand-ink);
     --color-on-brand: var(--on-brand);
+    --color-accent: var(--accent);
+    --color-sage: var(--sage);
+    --color-sage-soft: var(--sage-soft);
 
     --color-success: var(--success);
     --color-success-soft: var(--success-soft);
@@ -41,58 +50,77 @@
 }
 
 :root {
-    /* Neutrals lean slightly toward the teal brand so the UI feels of a piece. */
-    --canvas: #f4f7f7;
-    --surface: #ffffff;
-    --surface-muted: #eef3f3;
-    --line: #dde6e6;
-    --line-strong: #c3d1d1;
-    --ink: #0f1c1d;
-    --ink-muted: #4e6264;
-    --ink-subtle: #7f9294;
+    /* Warm neutrals: alabaster paper and charcoal ink, never pure white or black. */
+    --canvas: #f6f4ef;
+    --surface: #fbfaf7;
+    --surface-muted: #efece4;
+    --line: #dfdbd0;
+    --line-strong: #c9c3b5;
+    --ink: #161614;
+    --ink-muted: #5c5a54;
+    --ink-subtle: #858177;
 
-    --brand: #0f766e;
-    --brand-hover: #115e59;
-    --brand-soft: #e0f2ef;
-    --brand-ink: #0b5a53;
+    /*
+     * --accent is the logo's terracotta, for marks and small indicators.
+     * --brand is one step deeper so white button text passes WCAG AA (4.9:1),
+     * and --brand-ink is deeper again for terracotta text on the canvas.
+     */
+    --accent: #c85a32;
+    --brand: #b9512b;
+    --brand-hover: #a2441f;
+    --brand-soft: #f6e4da;
+    --brand-ink: #9e421d;
     --on-brand: #ffffff;
+    --sage: #849686;
+    --sage-soft: #e4e9e2;
 
-    --success: #15803d;
-    --success-soft: #e3f4e8;
-    --warning: #a35a00;
-    --warning-soft: #fdf1dc;
-    --danger: #c0262d;
-    --danger-hover: #a11f25;
-    --danger-soft: #fce7e7;
+    --success: #356c44;
+    --success-soft: #e4eee2;
+    --warning: #855610;
+    --warning-soft: #f5ead5;
+    --danger: #b3372b;
+    --danger-hover: #962c22;
+    --danger-soft: #f7e3de;
 
     color-scheme: light;
 }
 
 .dark {
-    --canvas: #0b1213;
-    --surface: #111b1c;
-    --surface-muted: #172324;
-    --line: #223132;
-    --line-strong: #314446;
-    --ink: #e5eeee;
-    --ink-muted: #9db0b1;
-    --ink-subtle: #6c8183;
+    --canvas: #141311;
+    --surface: #1c1b18;
+    --surface-muted: #24221e;
+    --line: #2f2c27;
+    --line-strong: #433f38;
+    --ink: #ece8df;
+    --ink-muted: #ada79b;
+    --ink-subtle: #7f796e;
 
-    --brand: #2dd4bf;
-    --brand-hover: #5eead4;
-    --brand-soft: #123a37;
-    --brand-ink: #7ee8d9;
-    --on-brand: #04201d;
+    --accent: #e07a52;
+    --brand: #e07a52;
+    --brand-hover: #eb916d;
+    --brand-soft: #3a2219;
+    --brand-ink: #f0a07f;
+    --on-brand: #161614;
+    --sage: #a3b3a4;
+    --sage-soft: #222a23;
 
-    --success: #4ade80;
-    --success-soft: #133222;
-    --warning: #f5b454;
-    --warning-soft: #392911;
-    --danger: #f87171;
-    --danger-hover: #fca5a5;
-    --danger-soft: #3d1517;
+    --success: #8dbf97;
+    --success-soft: #1f2a21;
+    --warning: #e6b56a;
+    --warning-soft: #2e2414;
+    --danger: #ef8a78;
+    --danger-hover: #f5aa9c;
+    --danger-soft: #351b17;
 
     color-scheme: dark;
+}
+
+/* Editorial display type: tight tracking and balanced leading for headlines. */
+@utility font-display-tight {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
 }
 
 [x-cloak] {

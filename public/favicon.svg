@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- BandarOS app icon: the logo mark on a charcoal tile (see resources/views/components/logo.blade.php). -->
+  <rect width="64" height="64" rx="14" fill="#161614"/>
+  <g transform="translate(14.5 9) scale(0.146)">
+    <rect x="0" y="0" width="38" height="315" rx="5" fill="#f6f4ef"/>
+    <path d="M49 16H190L222 48V120L198 150L222 180V268L190 299H49" fill="none" stroke="#f6f4ef" stroke-width="32"/>
+    <path d="M66 128V55H136V90" fill="none" stroke="#f6f4ef" stroke-width="14"/>
+    <path d="M66 270V180H136V218" fill="none" stroke="#f6f4ef" stroke-width="14"/>
+    <rect x="57" y="138" width="130" height="22" fill="#e07a52"/>
+    <path d="M185 136L211 149L185 162Z" fill="#e07a52"/>
+  </g>
+</svg>

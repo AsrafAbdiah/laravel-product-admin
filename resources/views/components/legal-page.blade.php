@@ -3,7 +3,7 @@
 {{-- Shared frame for the Terms and Privacy pages. --}}
 <x-marketing-layout :title="$title" :description="$description">
     <article class="mx-auto max-w-3xl px-4 pt-16 pb-24 sm:px-6">
-        <h1 class="text-4xl font-semibold tracking-tight">{{ $title }}</h1>
+        <h1 class="font-display-tight text-5xl">{{ $title }}</h1>
         <p class="mt-3 text-sm text-ink-subtle">Last updated {{ $updated }}</p>
 
         <div class="mt-8 flex gap-3 rounded-lg border border-warning/30 bg-warning-soft px-4 py-3 text-sm">
