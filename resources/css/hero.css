@@ -21,6 +21,61 @@
     }
 }
 
+/* The drag-to-spin model (resources/js/spinner.js). */
+.hero-spinner {
+    cursor: grab;
+    /* Vertical swipes still scroll the page on touch screens; horizontal ones turn the model. */
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.hero-spinner[data-dragging] {
+    cursor: grabbing;
+}
+
+/* The poster shows until the sprite sheet has loaded, then the canvas fades in over it. */
+.hero-spinner canvas {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.hero-spinner[data-ready] canvas {
+    opacity: 1;
+}
+
+.hero-spinner[data-ready] [data-spinner-poster] {
+    opacity: 0;
+    transition: opacity 0.4s ease 0.2s;
+}
+
+/* The hint steps back once the visitor has turned the model. */
+.hero-spin-hint {
+    transition: opacity 0.5s ease;
+}
+
+[data-hero]:has([data-spinner][data-touched]) .hero-spin-hint {
+    opacity: 0.45;
+}
+
+.hero-spin-tick {
+    display: block;
+    width: 0.875rem;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--line-strong);
+    transition: background-color 0.3s ease;
+}
+
+.hero-spin-tick[data-active] {
+    background: var(--accent);
+}
+
+/* The ground line fades out at both ends. */
+.hero-ground {
+    mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
+}
+
 @layer components {
     /* Small editorial cards layered over the shop illustration. */
     .hero-card {

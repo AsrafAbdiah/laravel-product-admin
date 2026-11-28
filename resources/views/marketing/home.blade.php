@@ -39,157 +39,148 @@
     @endpush
 
     {{--
-        Hero: an asymmetric editorial grid. Text on the left, an interactive
-        preview of the product on the right. Motion lives in resources/js/hero.js;
-        elements marked data-reveal start hidden only when JavaScript runs
-        (resources/css/hero.css), so the page is complete without it.
+        Hero: a centred stage. Headline above, the drag-to-spin shop model in
+        the middle with cards floating around it, buttons below. Motion lives in
+        resources/js/hero.js and spinner.js; elements marked data-reveal start
+        hidden only when JavaScript runs (resources/css/hero.css), so the page
+        is complete without it.
     --}}
     <section data-hero class="relative overflow-hidden border-b border-line">
-        <div class="mx-auto grid max-w-7xl grid-cols-12 px-4 sm:px-6 lg:px-10">
-            {{-- Left: message and calls to action (columns 1-6) --}}
-            <div class="col-span-12 flex flex-col justify-center py-14 sm:py-20 lg:col-span-6 lg:border-r lg:border-line lg:py-24 lg:pr-12">
-                <p data-reveal="fade" class="flex items-center gap-3 font-mono text-xs tracking-[0.14em] text-ink-muted uppercase">
+        <div class="mx-auto flex max-w-7xl flex-col px-4 pt-14 pb-16 sm:px-6 sm:pt-20 lg:px-10">
+            {{-- Headline --}}
+            <div class="order-1 mx-auto max-w-3xl text-center">
+                <p data-reveal="fade" class="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.14em] text-ink-muted uppercase">
                     <span class="text-accent">01</span>
                     <span class="h-px w-8 bg-line-strong" aria-hidden="true"></span>
                     Inventory for small shops
                 </p>
 
-                <h1 data-reveal class="font-display-tight mt-8 text-[clamp(2.75rem,5.4vw,5rem)] text-ink">
+                <h1 data-reveal class="font-display-tight mt-7 text-[clamp(2.75rem,6vw,5.25rem)] text-ink">
                     <span class="block overflow-hidden pb-[0.06em]"><span data-hero-line class="block">Every shelf counted.</span></span>
                     <span class="block overflow-hidden pb-[0.06em]"><span data-hero-line class="block text-ink-muted italic">Every change signed.</span></span>
                 </h1>
 
-                <p data-reveal="fade" class="mt-8 max-w-md text-lg leading-relaxed text-ink-muted">
+                <p data-reveal="fade" class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
                     Stock, staff and an audit trail for shops run by a small team.
                     Know what’s running low before the shelf is empty.
                 </p>
+            </div>
 
-                <div data-reveal="fade" class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-                    {{-- The zone is a little larger than the button, so the pull starts just before the pointer reaches it. --}}
-                    <span data-magnetic-zone class="-m-4 inline-block p-4">
-                        <a data-magnetic href="{{ auth()->check() ? route('dashboard') : route('register') }}"
-                           class="inline-flex items-center gap-3 rounded-full bg-brand px-7 py-4 text-[15px] font-semibold text-on-brand transition-colors hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand">
-                            <span data-magnetic-label class="inline-flex items-center gap-3">
-                                {{ auth()->check() ? 'Go to dashboard' : 'Start free' }}
-                                <x-ui.icon name="arrow-right" class="h-4 w-4" />
-                            </span>
-                        </a>
-                    </span>
-                    <a href="{{ route('pricing') }}" class="group inline-flex items-center gap-2 text-[15px] font-medium text-ink">
-                        <span class="border-b border-line-strong pb-0.5 transition-colors group-hover:border-ink">See pricing</span>
+            {{-- Stage: the model, its readout, and the cards (floating beside it on large screens) --}}
+            <div data-hero-stage class="relative order-3 mx-auto mt-10 w-full max-w-6xl lg:order-2 lg:mt-6">
+                <div data-hero-visual data-reveal class="relative mx-auto w-full max-w-[680px]">
+                    <div data-depth="0.15" class="relative">
+                        {{-- A hairline "ground" at the level the shop stands on (frames have a 24px base margin of 536) --}}
+                        <div class="hero-ground pointer-events-none absolute -inset-x-[40%] bottom-[4.5%] h-px bg-line-strong" aria-hidden="true"></div>
+
+                        <div data-spinner role="img" aria-label="A 3D model of a convenience store"
+                             data-src="{{ asset('images/mini-mart-spin.webp') }}" data-frames="5" data-columns="4" data-rows="2"
+                             class="hero-spinner relative aspect-[692/536] w-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-4 focus-visible:ring-offset-canvas">
+                            <img data-spinner-poster src="{{ asset('images/mini-mart.webp') }}" width="692" height="536" alt="" draggable="false"
+                                 fetchpriority="high" decoding="async" class="absolute inset-0 h-full w-full object-contain">
+                            <canvas data-spinner-canvas class="absolute inset-0 h-full w-full" aria-hidden="true"></canvas>
+                        </div>
+                    </div>
+
+                    {{-- Drag hint, current angle and one tick per view --}}
+                    <div class="mt-3 flex items-center justify-center gap-4 font-mono text-[11px] tracking-wide text-ink-muted uppercase" aria-hidden="true">
+                        <span data-spin-hint class="hero-spin-hint flex items-center gap-2">
+                            <svg viewBox="0 0 32 24" class="h-4 w-6 text-accent" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 6h7M3 6l2.5-2.5M3 6l2.5 2.5M29 6h-7M29 6l-2.5-2.5M29 6l2.5 2.5" />
+                                <path d="M13.5 16V8.5a1.5 1.5 0 0 1 3 0V14m0-1.5a1.5 1.5 0 0 1 3 0V15m0-1a1.5 1.5 0 0 1 3 0v3.5a5 5 0 0 1-5 5h-1.2a5 5 0 0 1-4.1-2.1L9.4 17a1.4 1.4 0 0 1 2.2-1.7l1.9 2" />
+                            </svg>
+                            Drag to rotate 360°
+                        </span>
+                        <span class="h-3 w-px bg-line-strong"></span>
+                        <span data-spin-angle class="w-9 text-ink tabular-nums">000°</span>
+                        <span class="flex gap-1">
+                            @for ($i = 0; $i < 5; $i++)
+                                <span data-spin-tick @if ($i === 0) data-active @endif class="hero-spin-tick"></span>
+                            @endfor
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Cards: a grid under the model on small screens, floating around it on large ones --}}
+                <div class="mt-8 grid gap-3 sm:grid-cols-3 lg:mt-0 lg:block">
+                    <div data-depth="0.9" class="lg:absolute lg:top-[12%] lg:left-0 lg:w-64">
+                        <div data-reveal="card" data-drift="10">
+                            <div class="hero-card">
+                                <p class="hero-card-label"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span> Low stock · 09:14</p>
+                                <p class="mt-2 text-sm font-semibold">Kopi Robusta 1kg</p>
+                                <div class="mt-2 flex items-baseline justify-between">
+                                    <p class="font-display-tight text-4xl">3 <span class="text-base text-ink-muted">left</span></p>
+                                    <p class="font-mono text-[10px] text-ink-subtle uppercase">Reorder at 5</p>
+                                </div>
+                                <div class="mt-3 h-1 rounded-full bg-surface-muted"><div class="h-1 w-[15%] rounded-full bg-accent"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-depth="1.3" class="lg:absolute lg:top-[4%] lg:right-0 lg:w-60">
+                        <div data-reveal="card" data-drift="-14">
+                            <div class="hero-card">
+                                <p class="hero-card-label">Team · Kedai Siti</p>
+                                <ul class="mt-3 space-y-2 text-sm">
+                                    <li class="flex items-center justify-between gap-3"><span class="font-medium">Siti</span><span class="hero-tag bg-brand-soft text-brand-ink">Owner</span></li>
+                                    <li class="flex items-center justify-between gap-3"><span class="font-medium">Amir</span><span class="hero-tag bg-sage-soft text-ink-muted">Staff</span></li>
+                                    <li class="flex items-center justify-between gap-3"><span class="font-medium">Mei</span><span class="hero-tag bg-surface-muted text-ink-muted">Viewer</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-depth="0.7" class="lg:absolute lg:right-[3%] lg:bottom-[20%] lg:w-72">
+                        <div data-reveal="card" data-drift="8">
+                            <div class="hero-card">
+                                <p class="hero-card-label"><span class="h-1.5 w-1.5 rounded-full bg-sage"></span> Audit log</p>
+                                <ol class="mt-3 space-y-2.5 text-sm">
+                                    <li class="grid grid-cols-[3rem_1fr] gap-2">
+                                        <span class="font-mono text-xs text-ink-subtle">09:42</span>
+                                        <span><span class="font-medium">Amir</span> changed price <span class="font-mono text-xs whitespace-nowrap">RM 18 → RM 20</span></span>
+                                    </li>
+                                    <li class="grid grid-cols-[3rem_1fr] gap-2">
+                                        <span class="font-mono text-xs text-ink-subtle">09:15</span>
+                                        <span><span class="font-medium">Siti</span> restocked Teh Tarik Mix <span class="font-mono text-xs">+24</span></span>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Calls to action: right under the headline on phones, under the model on large screens --}}
+            <div data-reveal="fade" class="order-2 mt-9 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 lg:order-3 lg:mt-10">
+                {{-- The zone is a little larger than the button, so the pull starts just before the pointer reaches it. --}}
+                <span data-magnetic-zone class="-m-4 inline-block p-4">
+                    <a data-magnetic href="{{ auth()->check() ? route('dashboard') : route('register') }}"
+                       class="inline-flex items-center gap-3 rounded-full bg-brand px-7 py-4 text-[15px] font-semibold text-on-brand transition-colors hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand">
+                        <span data-magnetic-label class="inline-flex items-center gap-3">
+                            {{ auth()->check() ? 'Go to dashboard' : 'Start free' }}
+                            <x-ui.icon name="arrow-right" class="h-4 w-4" />
+                        </span>
                     </a>
-                </div>
-
-                <dl data-reveal="fade" class="mt-14 grid max-w-lg grid-cols-3 border-t border-line pt-5 font-mono text-[11px] tracking-wide uppercase">
-                    <div>
-                        <dt class="text-ink-subtle">Free plan</dt>
-                        <dd class="mt-1 text-ink">{{ $plans['free']['max_products'] }} products</dd>
-                    </div>
-                    <div class="border-l border-line pl-4">
-                        <dt class="text-ink-subtle">Card</dt>
-                        <dd class="mt-1 text-ink">Not needed</dd>
-                    </div>
-                    <div class="border-l border-line pl-4">
-                        <dt class="text-ink-subtle">Your data</dt>
-                        <dd class="mt-1 text-ink">Kept per shop</dd>
-                    </div>
-                </dl>
+                </span>
+                <a href="{{ route('pricing') }}" class="group inline-flex items-center gap-2 text-[15px] font-medium text-ink">
+                    <span class="border-b border-line-strong pb-0.5 transition-colors group-hover:border-ink">See pricing</span>
+                </a>
             </div>
 
-            {{-- Right: interactive preview (columns 7-12) --}}
-            <div class="col-span-12 pb-14 lg:col-span-6 lg:py-16 lg:pl-12">
-                <div data-hero-visual data-reveal class="relative">
-                    {{-- data-tilt rotates gently with the pointer; data-depth layers shift by different amounts. --}}
-                    <div data-tilt class="relative aspect-[1400/1226] overflow-hidden rounded-[20px] border border-line bg-sage-soft">
-                        <div data-depth="0.2" class="absolute inset-0">
-                            <picture>
-                                <source type="image/webp" srcset="{{ asset('images/hero-shop-700.webp') }} 700w, {{ asset('images/hero-shop.webp') }} 1400w"
-                                        sizes="(min-width: 1024px) 560px, 92vw">
-                                <img src="{{ asset('images/hero-shop.jpg') }}" srcset="{{ asset('images/hero-shop-700.jpg') }} 700w, {{ asset('images/hero-shop.jpg') }} 1400w"
-                                     sizes="(min-width: 1024px) 560px, 92vw" width="1400" height="1226" fetchpriority="high" decoding="async"
-                                     class="h-full w-full scale-[1.06] object-cover"
-                                     alt="Illustration of a two-storey corner shop with striped awnings">
-                            </picture>
-                        </div>
-
-                        {{-- Tab panels: editorial cards layered over the shop --}}
-                        <div id="hero-panel-stock" role="tabpanel" aria-labelledby="hero-tab-stock" data-panel class="absolute inset-0">
-                            <div data-depth="0.9" class="absolute bottom-[7%] left-[5%] w-[58%] max-w-72">
-                                <div data-card class="hero-card">
-                                    <p class="hero-card-label"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span> Low stock · 09:14</p>
-                                    <p class="mt-2 text-sm font-semibold">Kopi Robusta 1kg</p>
-                                    <div class="mt-2 flex items-baseline justify-between">
-                                        <p class="font-display-tight text-4xl">3 <span class="text-base text-ink-muted">left</span></p>
-                                        <p class="font-mono text-[10px] text-ink-subtle uppercase">Reorder at 5</p>
-                                    </div>
-                                    <div class="mt-3 h-1 rounded-full bg-surface-muted"><div class="h-1 w-[15%] rounded-full bg-accent"></div></div>
-                                </div>
-                            </div>
-                            <div data-depth="1.4" class="absolute top-[7%] right-[5%]">
-                                <div data-card class="hero-card px-3 py-2">
-                                    <p class="hero-card-label">Today</p>
-                                    <p class="mt-1 text-sm font-semibold">42 sold <span class="ml-1 rounded-full bg-sage-soft px-2 py-0.5 font-mono text-[10px] text-ink-muted">+12%</span></p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="hero-panel-team" role="tabpanel" aria-labelledby="hero-tab-team" data-panel class="absolute inset-0" hidden>
-                            <div data-depth="0.9" class="absolute bottom-[7%] left-[5%] w-[60%] max-w-76">
-                                <div data-card class="hero-card">
-                                    <p class="hero-card-label">Team · Kedai Siti</p>
-                                    <ul class="mt-3 space-y-2 text-sm">
-                                        <li class="flex items-center justify-between gap-3"><span class="font-medium">Siti</span><span class="hero-tag bg-brand-soft text-brand-ink">Owner</span></li>
-                                        <li class="flex items-center justify-between gap-3"><span class="font-medium">Amir</span><span class="hero-tag bg-sage-soft text-ink-muted">Staff</span></li>
-                                        <li class="flex items-center justify-between gap-3"><span class="font-medium">Mei</span><span class="hero-tag bg-surface-muted text-ink-muted">Viewer</span></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div data-depth="1.4" class="absolute top-[7%] right-[5%]">
-                                <div data-card class="hero-card px-3 py-2">
-                                    <p class="hero-card-label">Invitation sent</p>
-                                    <p class="mt-1 text-sm font-semibold">Expires in 7 days</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="hero-panel-audit" role="tabpanel" aria-labelledby="hero-tab-audit" data-panel class="absolute inset-0" hidden>
-                            <div data-depth="0.9" class="absolute bottom-[7%] left-[5%] w-[72%] max-w-84">
-                                <div data-card class="hero-card">
-                                    <p class="hero-card-label">Audit log</p>
-                                    <ol class="mt-3 space-y-2.5 text-sm">
-                                        <li class="grid grid-cols-[3rem_1fr] gap-2">
-                                            <span class="font-mono text-xs text-ink-subtle">09:42</span>
-                                            <span><span class="font-medium">Amir</span> changed price <span class="font-mono text-xs whitespace-nowrap">RM 18.00 → RM 20.00</span></span>
-                                        </li>
-                                        <li class="grid grid-cols-[3rem_1fr] gap-2">
-                                            <span class="font-mono text-xs text-ink-subtle">09:15</span>
-                                            <span><span class="font-medium">Siti</span> restocked Teh Tarik Mix <span class="font-mono text-xs">+24</span></span>
-                                        </li>
-                                    </ol>
-                                </div>
-                            </div>
-                            <div data-depth="1.4" class="absolute top-[7%] right-[5%]">
-                                <div data-card class="hero-card px-3 py-2">
-                                    <p class="hero-card-label"><span class="h-1.5 w-1.5 rounded-full bg-sage"></span> Signed</p>
-                                    <p class="mt-1 text-sm font-semibold">Every change, by name</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Tabs. Hidden without JavaScript, when only the first panel shows. --}}
-                    <div role="tablist" aria-label="Product preview" class="relative mt-4 hidden grid-cols-3 border-t border-line [.js_&]:grid">
-                        <span data-tab-indicator class="absolute -top-px left-0 h-0.5 w-1/3 bg-accent" aria-hidden="true"></span>
-                        @foreach (['stock' => 'Stock', 'team' => 'Team', 'audit' => 'Audit'] as $key => $label)
-                            <button type="button" role="tab" id="hero-tab-{{ $key }}" aria-controls="hero-panel-{{ $key }}"
-                                    aria-selected="{{ $loop->first ? 'true' : 'false' }}" tabindex="{{ $loop->first ? '0' : '-1' }}"
-                                    class="group py-3 text-left font-mono text-xs tracking-wide text-ink-subtle uppercase transition-colors hover:text-ink aria-selected:text-ink">
-                                <span class="mr-1.5 group-aria-selected:text-accent">0{{ $loop->iteration }}</span>{{ $label }}
-                            </button>
-                        @endforeach
-                    </div>
+            <dl data-reveal="fade" class="order-4 mx-auto mt-12 grid w-full max-w-2xl grid-cols-3 border-t border-line pt-5 text-center font-mono text-[11px] tracking-wide uppercase">
+                <div>
+                    <dt class="text-ink-subtle">Free plan</dt>
+                    <dd class="mt-1 text-ink">{{ $plans['free']['max_products'] }} products</dd>
                 </div>
-            </div>
+                <div class="border-l border-line">
+                    <dt class="text-ink-subtle">Card</dt>
+                    <dd class="mt-1 text-ink">Not needed</dd>
+                </div>
+                <div class="border-l border-line">
+                    <dt class="text-ink-subtle">Your data</dt>
+                    <dd class="mt-1 text-ink">Kept per shop</dd>
+                </div>
+            </dl>
         </div>
     </section>
 

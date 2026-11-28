@@ -110,7 +110,21 @@ class MarketingPagesTest extends TestCase
     {
         $heroScript = Vite::asset('resources/js/hero.js');
 
-        $this->get('/')->assertOk()->assertSee($heroScript, false)->assertSee('role="tablist"', false);
+        $this->get('/')->assertOk()->assertSee($heroScript, false);
         $this->get('/pricing')->assertOk()->assertDontSee($heroScript, false);
+    }
+
+    #[Test]
+    public function the_hero_ships_the_spin_sprite_and_a_poster_that_works_without_javascript(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('data-src="'.asset('images/mini-mart-spin.webp').'" data-frames="5" data-columns="4" data-rows="2"', false)
+            ->assertSee('src="'.asset('images/mini-mart.webp').'"', false)
+            // It only becomes a slider once the script has loaded the sheet.
+            ->assertSee('role="img" aria-label="A 3D model of a convenience store"', false);
+
+        $this->assertFileExists(public_path('images/mini-mart-spin.webp'));
+        $this->assertFileExists(public_path('images/mini-mart.webp'));
     }
 }
