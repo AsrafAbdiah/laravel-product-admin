@@ -45,7 +45,7 @@
         JavaScript runs (resources/css/hero.css), so the page is complete without it.
     --}}
     <section data-hero class="relative overflow-hidden border-b border-line">
-        <div class="mx-auto flex max-w-7xl flex-col px-4 pt-14 pb-16 sm:px-6 sm:pt-20 lg:px-10">
+        <div class="mx-auto flex max-w-7xl flex-col px-4 pt-14 pb-16 sm:px-6 sm:pt-20 lg:h-[calc(100svh-66px)] lg:min-h-[540px] lg:px-10 lg:pt-[clamp(1rem,3vh,3rem)] lg:pb-[clamp(1rem,3vh,3rem)]">
             {{-- Headline --}}
             <div class="order-1 mx-auto max-w-3xl text-center">
                 <p data-reveal="fade" class="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.14em] text-ink-muted uppercase">
@@ -54,21 +54,21 @@
                     Inventory for small shops
                 </p>
 
-                <h1 data-reveal class="font-display-tight mt-7 text-[clamp(2.75rem,6vw,5.25rem)] text-ink">
+                <h1 data-reveal class="font-display-tight mt-7 text-[clamp(2.75rem,6vw,5.25rem)] text-ink lg:mt-[clamp(0.75rem,2vh,1.75rem)] lg:text-[clamp(2.75rem,min(5.6vw,8.2vh),5.25rem)]">
                     <span class="block overflow-hidden pb-[0.06em]"><span data-hero-line class="block">Every shelf counted.</span></span>
                     <span class="block overflow-hidden pb-[0.06em]"><span data-hero-line class="block text-ink-muted italic">Every change signed.</span></span>
                 </h1>
 
-                <p data-reveal="fade" class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
+                <p data-reveal="fade" class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-muted lg:mt-[clamp(0.75rem,2vh,1.5rem)]">
                     Stock, staff and an audit trail for shops run by a small team.
                     Know what’s running low before the shelf is empty.
                 </p>
             </div>
 
             {{-- Stage: the shop model, with the cards floating beside it on large screens --}}
-            <div data-hero-stage class="relative order-3 mx-auto mt-10 w-full max-w-6xl lg:order-2 lg:mt-6">
-                <div data-hero-visual data-reveal class="relative mx-auto w-full max-w-[680px]">
-                    <div data-depth="0.15" class="relative">
+            <div data-hero-stage class="relative order-3 mx-auto mt-10 w-full max-w-6xl lg:order-2 lg:mt-[clamp(0.75rem,2vh,1.5rem)] lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:justify-center">
+                <div data-hero-visual data-reveal class="relative mx-auto w-full max-w-[680px] lg:h-full lg:max-h-[475px] lg:w-fit">
+                    <div data-depth="0.15" class="relative lg:h-full">
                         {{-- A hairline "ground" at the level the shop stands on (the image has a 5.7% base margin) --}}
                         <div class="hero-ground pointer-events-none absolute -inset-x-[40%] bottom-[5.7%] h-px bg-line-strong" aria-hidden="true"></div>
 
@@ -76,7 +76,7 @@
                              srcset="{{ asset('images/mini-mart-800.webp') }} 800w, {{ asset('images/mini-mart.webp') }} 1400w"
                              sizes="(min-width: 768px) 680px, 92vw" width="1400" height="979"
                              fetchpriority="high" decoding="async" draggable="false"
-                             class="relative block h-auto w-full select-none"
+                             class="relative block h-auto w-full select-none lg:h-full lg:w-auto"
                              alt="A cut-away model of a convenience store with stocked shelves, drinks fridges and a checkout counter">
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                         </div>
                     </div>
 
-                    <div data-depth="0.7" class="lg:absolute lg:right-[3%] lg:bottom-[20%] lg:w-72">
+                    <div data-depth="0.7" class="lg:absolute lg:right-[3%] lg:bottom-[8%] lg:w-72 lg:short:hidden">
                         <div data-reveal="card">
                             <div class="hero-card">
                                 <p class="hero-card-label"><span class="h-1.5 w-1.5 rounded-full bg-sage"></span> Audit log</p>
@@ -131,7 +131,7 @@
             </div>
 
             {{-- Calls to action: right under the headline on phones, under the model on large screens --}}
-            <div data-reveal="fade" class="order-2 mt-9 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 lg:order-3 lg:mt-10">
+            <div data-reveal="fade" class="order-2 mt-9 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 lg:order-3 lg:mt-[clamp(0.75rem,2.5vh,2rem)]">
                 {{-- The zone is a little larger than the button, so the pull starts just before the pointer reaches it. --}}
                 <span data-magnetic-zone class="-m-4 inline-block p-4">
                     <a data-magnetic href="{{ auth()->check() ? route('dashboard') : route('register') }}"
@@ -147,7 +147,7 @@
                 </a>
             </div>
 
-            <dl data-reveal="fade" class="order-4 mx-auto mt-12 grid w-full max-w-2xl grid-cols-3 border-t border-line pt-5 text-center font-mono text-[11px] tracking-wide uppercase">
+            <dl data-reveal="fade" class="order-4 mx-auto mt-12 grid w-full max-w-2xl grid-cols-3 border-t border-line pt-5 text-center font-mono text-[11px] tracking-wide uppercase lg:mt-[clamp(1rem,3vh,3rem)] lg:hidden lg:tall:grid">
                 <div>
                     <dt class="text-ink-subtle">Free plan</dt>
                     <dd class="mt-1 text-ink">{{ $plans['free']['max_products'] }} products</dd>

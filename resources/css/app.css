@@ -7,6 +7,12 @@
 /* Dark mode follows a "dark" class on <html>, set by the theme toggle. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Screens tall enough for extras that would otherwise push the hero past one viewport. */
+@custom-variant tall (@media (min-height: 960px));
+
+/* Screens too short for every hero card to fit beside the model. */
+@custom-variant short (@media (max-height: 779px));
+
 /*
  * BandarOS design tokens: a warm editorial palette built around the
  * terracotta in the logo.
